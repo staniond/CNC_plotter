@@ -33,9 +33,10 @@ void loop() {
   if(Serial.available()){
     int length = Serial.readBytesUntil('\n', buffer, bufferLen-1);
     buffer[length] = '\0';
-    int commandLength = parseCommand(length);
+    
+    int commandLength = parseBuffer(length);
     for(int i = 0; i<commandLength;i++){
-      Serial.print(String(command[i].letter) + " ");
+      Serial.print(String(command[i].letter));
       Serial.println(command[i].num, 5);
     }
   }

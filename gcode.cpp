@@ -4,7 +4,7 @@
 char buffer[bufferLen];
 Field command[commandLen];
 
-int parseCommand(int bufferLength){
+int parseBuffer(int bufferLength){
   int commandLength = 0;
   for(int i = 0; i < bufferLength; i++){
     if(commandLength >= commandLen){
@@ -21,26 +21,26 @@ int parseCommand(int bufferLength){
           break;
         }
       }
-    }else if(buffer[i] == ' '){
+    }else if(buffer[i] == ' '){ //skip whitespaces
       continue;
     }
     if(isAlpha(buffer[i])){
       command[commandLength].letter = buffer[i];
       command[commandLength].num = atof(&buffer[++i]);
       while(i<bufferLength){
-        if(isDigit(buffer[i]) || buffer[i] == '.' || buffer[i] == ' '){
+        if(isDigit(buffer[i]) || buffer[i] == '.' || buffer[i] == ' ' || buffer[i] == '-' || buffer[i] == '+'){
           i++;
           continue;
         }
-        else
+        else{
           i--;
-          break;
+          break; 
+        }
       }
       commandLength++;
     }else{
       Serial.println("WTF?");
     }
   }
-  Serial.print('\n');
   return commandLength;
 }
