@@ -1,3 +1,5 @@
+#pragma once
+
 typedef struct Motor {
   int step;
   int dir;
@@ -9,7 +11,7 @@ extern Motor motor2;
 
 const int stepsPerRevolution = 20;
 const int resolution = 16;
-const int maxSteps = 250 * 16;
+const int maxSteps = 265 * 16;  //check
 const int maxSpeed = 1500 * 16; //RPM (0.5 seconds from start to max)
 
 void motor_setup();

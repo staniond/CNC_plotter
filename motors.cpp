@@ -28,7 +28,7 @@ void motor_setup(){
   digitalWrite(motor1.enabled, HIGH); //turn off power to motors by default
   digitalWrite(motor2.enabled, HIGH);
 
-  motorSetSpeed(35*16);
+  motorSetSpeed(35);
 }
 
 void motor_step(int steps){
@@ -59,5 +59,5 @@ void motor_power(bool on){
 
 void motorSetSpeed(int speed){
   motorSpeed = speed;
-  motorDelay = (60*100000)/(speed * stepsPerRevolution);
+  motorDelay = (60*100000)/(speed * stepsPerRevolution * 16);
 }

@@ -1,3 +1,5 @@
+#pragma once
+
 enum Led { RED = 23,
            YELLOW = 22,
            GREEN = 21,

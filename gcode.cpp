@@ -1,8 +1,25 @@
 #include <Arduino.h>
 #include "gcode.h"
+#include "servo.h"
 
 char buffer[bufferLen];
 Field command[commandLen];
+
+void processCommand(int commandLength) {
+  for(int i = 0; i < commandLength; i++){
+      Serial.print(String(command[i].letter));
+      Serial.println(command[i].num, 5);
+      
+      switch(command[i].letter) {
+        case 'S':
+          moveServo(command[i].num);
+          break;
+        default:
+          Serial.println("Gcode command not recognized");
+          break;
+      }
+  }
+}
 
 int parseBuffer(int bufferLength){
   int commandLength = 0;

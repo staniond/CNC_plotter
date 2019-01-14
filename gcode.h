@@ -1,3 +1,5 @@
+#pragma once
+
 typedef struct Field {
   char letter;
   double num;
@@ -10,3 +12,4 @@ extern char buffer[bufferLen];
 extern Field command[commandLen];
 
 int parseBuffer(int);
+void processCommand(int);

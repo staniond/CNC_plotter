@@ -2,6 +2,7 @@
 #include "led.h"
 #include "motors.h"
 #include "gcode.h"
+#include "servo.h"
 
 
 const char* ssid     = "UPC3618829";
@@ -19,13 +20,15 @@ void setup() {
   
   motor_setup();
 
+  servoSetup();
+
   Serial.begin(115200);
   while(!Serial){
     ;
   }
 
   Serial.println("Booted");
-  //connectToWifi();
+  //  connectToWifi();
   led_light(GREEN);
 } 
 
@@ -35,10 +38,7 @@ void loop() {
     buffer[length] = '\0';
     
     int commandLength = parseBuffer(length);
-    for(int i = 0; i<commandLength;i++){
-      Serial.print(String(command[i].letter));
-      Serial.println(command[i].num, 5);
-    }
+    processCommand(commandLength);
   }
 }
 
