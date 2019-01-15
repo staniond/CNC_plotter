@@ -16,7 +16,7 @@ const int maxSteps = 4240;
 const int maxRangeMM = 40;
 const int stepsPerMM = maxSteps/maxRangeMM;
 
-const int maxSpeed = 4800; //mm/min
+const int maxSpeed = 3000; //mm/min
 const int normalSpeed = 1200;
 
 void motorSetup();

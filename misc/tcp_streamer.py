@@ -36,7 +36,7 @@ import time
 s = serial.Serial('/home/standa/dev/ttyUSB0',115200)
 
 # Open g-code file
-f = open('circle.gcode','r');
+f = open('../gcode/suva.nc','r');
 
 # Wake up grbl
 s.write("\r\n\r\n")

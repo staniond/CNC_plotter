@@ -74,7 +74,7 @@ void gCommand(double num, int commandLength) {
 }
 
 void sCommand(double num, int commandLength){
-  
+  moveServo(num);
 }
 
 int parseBuffer(int bufferLength){

@@ -21,6 +21,8 @@ void moveServo(int percent){
   servoPos = percent;
   
   int pos = map(percent, 0, 100, servoDown, servoUp);
+  
+  
   servo.write(pos);
   delayMicroseconds(500);
   
