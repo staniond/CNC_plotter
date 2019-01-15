@@ -31,12 +31,13 @@ THE SOFTWARE.
 
 import serial
 import time
+import sys
 
 # Open grbl serial port
-s = serial.Serial('/home/standa/dev/ttyUSB0',115200)
+s = serial.Serial('./ttyUSB0',115200)
 
 # Open g-code file
-f = open('../gcode/suva.nc','r');
+f = open(sys.argv[1],'r');
 
 # Wake up grbl
 s.write("\r\n\r\n")

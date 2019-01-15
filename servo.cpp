@@ -24,7 +24,7 @@ void moveServo(int percent){
   
   
   servo.write(pos);
-  delayMicroseconds(500);
+  delayMicroseconds(350000);
   
   Logln("Pen set to " + String(percent) + " percent height");
 }
