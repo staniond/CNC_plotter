@@ -16,7 +16,7 @@ void processCommand(int commandLength) {
           gCommand(command[i].num, commandLength);
           break;
         case 'S':
-          moveServo(command[i].num);
+          sCommand(command[i].num, commandLength);
           break;
         case 'M':
           motorSetSpeed(command[i].num);
@@ -24,22 +24,27 @@ void processCommand(int commandLength) {
         case 'N':
           motorStep(command[i].num);
           break;
-        case 'P':
+        case 'E':
           motorPower(command[i].num);
           break;
       }
   }
-  Println("OK");
+  Println("ok");
+  client.flush();
 }
 
 void gCommand(double num, int commandLength) {
-  if(num != 1 && num != 2){
+  boolean move = false;
+  if(num != 0 && num != 1){
     Logln("gcommand not implemented");
     return;
   }
-
-  if(num == 1){
-    
+  
+  double feedRate = normalSpeed;
+  if(num == 0){
+      feedRate = maxSpeed;
+  }else if(num == 1){
+      feedRate = normalSpeed;
   }
   
   Logln("Line motion");
@@ -48,17 +53,28 @@ void gCommand(double num, int commandLength) {
   for(int i = 0; i < commandLength; i++){
     if(command[i].letter == 'X'){
         newX = command[i].num;
-    }else if(command[i].letter == 'Y')
+        move = true;
+    }else if(command[i].letter == 'Y'){
         newY = command[i].num;
-     else if(command[i].letter == 'Z'){
+        move = true;
+    }else if(command[i].letter == 'Z'){
         if(command[i].num >= 0){
           moveServo(UP);
         }else{
           moveServo(DOWN);
         }
+     }else if(command[i].letter == 'F'){
+       feedRate = command[i].num;
      }
   }
-  plotLine(newX, newY);
+  motorSetSpeed(feedRate);
+  if(move){
+      plotLine(newX, newY); 
+  }
+}
+
+void sCommand(double num, int commandLength){
+  
 }
 
 int parseBuffer(int bufferLength){

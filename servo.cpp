@@ -3,8 +3,10 @@
 
 Servo servo;
 const int servoPin = 32;
-const int servoDown = 110;
-const int servoUp = 20;
+const int servoDown = 110; //all the way down
+const int servoUp = 20; //all the way up
+
+int servoPaper = servoUp; //needs settings
 
 int servoPos = 0; //in percent - 0 is down
 
@@ -20,6 +22,7 @@ void moveServo(int percent){
   
   int pos = map(percent, 0, 100, servoDown, servoUp);
   servo.write(pos);
+  delayMicroseconds(500);
   
   Logln("Pen set to " + String(percent) + " percent height");
 }

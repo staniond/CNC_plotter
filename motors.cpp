@@ -33,11 +33,10 @@ void motorSetup(){
   digitalWrite(motor1.enabled, HIGH); //turn off power to motors by default
   digitalWrite(motor2.enabled, HIGH);
 
-  motorSetSpeed();
+  motorSetSpeed(normalSpeed);
 }
 
 void plotLine(double xPosMM, double yPosMM) {
-  motorPower(HIGH);
   
   xPosMM = constrain(xPosMM, 0, maxRangeMM);
   yPosMM = constrain(yPosMM, 0, maxRangeMM);
@@ -72,7 +71,7 @@ void plotLine(double xPosMM, double yPosMM) {
           lineHigh(xPos, yPos, newX, newY);
       }
   }
-  motorPower(LOW);
+
   xPos = newX;
   yPos = newY;
   Logln(String("New pos - ") + String(xPos) + ", " + String(yPos));
@@ -156,6 +155,7 @@ void motorPower(bool on){
   digitalWrite(motor2.enabled, !on);
   delayMicroseconds(5);
   powerEnabled = on;
+  Logln("Motor power switched " + String(on?"ON":"OFF"));
 }
 
 void motorPower(){
@@ -164,6 +164,12 @@ void motorPower(){
   
 
 void motorSetSpeed(int speed){
+  speed = constrain(speed, speed, maxSpeed);
+  if(speed <= 0) {
+    speed = normalSpeed;
+  }
+  
   motorSpeed = speed;
-  motorDelay = (1000000)/(speed * 106);
+  motorDelay = (60 * 1000000)/(speed * 106);
+  Logln("Motor speed set to " + String(speed) + " mm/sec");
 }

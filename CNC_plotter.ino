@@ -64,7 +64,8 @@ void wifiLoop(){
   
   if(client){
     Serial.println("New Client");
-    client.println("CNC_plotter ready");
+    client.println("Grbl 1.1 ['$' for help]");
+    client.flush();
     while(client.connected()){
       if(client.available()){
         int length = client.readBytesUntil('\n', buffer, bufferLen-1);
