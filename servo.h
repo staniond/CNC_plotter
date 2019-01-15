@@ -1,7 +1,8 @@
 #pragma once
-#include <ESP32Servo.h>
+#include "CNC_plotter.h"
 
-extern int servoPos;
+#define UP 100
+#define DOWN 0
 
 void servoSetup();
 void moveServo(int);

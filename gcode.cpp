@@ -1,21 +1,33 @@
 #include <Arduino.h>
 #include "gcode.h"
 #include "servo.h"
+#include "motors.h"
+#include "CNC_plotter.h"
+
 
 char buffer[bufferLen];
 Field command[commandLen];
 
 void processCommand(int commandLength) {
   for(int i = 0; i < commandLength; i++){
-      Serial.print(String(command[i].letter));
-      Serial.println(command[i].num, 5);
+      Log(String(command[i].letter));
+      Logln(command[i].num, 3);
       
       switch(command[i].letter) {
         case 'S':
           moveServo(command[i].num);
           break;
+        case 'M':
+          motorSetSpeed(command[i].num);
+          break;
+        case 'N':
+          motorStep(command[i].num);
+          break;
+        case 'P':
+          motorPower(command[i].num);
+          break;
         default:
-          Serial.println("Gcode command not recognized");
+          Logln("Gcode command not recognized");
           break;
       }
   }
@@ -56,7 +68,7 @@ int parseBuffer(int bufferLength){
       }
       commandLength++;
     }else{
-      Serial.println("WTF?");
+      Logln("WTF?");
     }
   }
   return commandLength;

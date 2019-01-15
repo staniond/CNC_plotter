@@ -3,21 +3,23 @@
 
 Servo servo;
 const int servoPin = 32;
-int servoPos = 0;
+const int servoDown = 110;
+const int servoUp = 20;
+
+int servoPos = 0; //in percent - 0 is down
 
 void servoSetup(){
   servo.attach(servoPin);
-  servo.write(servoPos);
+  moveServo(UP);
 }
 
 
-void moveServo(int pos){
-  if(pos < 0){
-    pos = 0;
-  }else if(pos > 180){
-    pos = 180;
-  }
-  servoPos = pos;
-  servo.write(servoPos);
-  Serial.println("Servo set to " + String(servoPos) + " degrees");
+void moveServo(int percent){
+  percent = constrain(percent, 0, 100);
+  servoPos = percent;
+  
+  int pos = map(percent, 0, 100, servoDown, servoUp);
+  servo.write(pos);
+  
+  Logln("Pen set to " + String(percent) + " percent height");
 }

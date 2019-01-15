@@ -1,9 +1,8 @@
-#include <WiFi.h>
+#include "CNC_plotter.h"
 #include "led.h"
 #include "motors.h"
 #include "gcode.h"
 #include "servo.h"
-
 
 const char* ssid     = "UPC3618829";
 const char* password = "chodnik23";
@@ -18,27 +17,65 @@ void setup() {
   led_setup();
   led_light(RED);
   
-  motor_setup();
+  motorSetup();
 
   servoSetup();
-
+  
   Serial.begin(115200);
   while(!Serial){
     ;
   }
 
   Serial.println("Booted");
-  //  connectToWifi();
+  
+  #ifdef WIFI
+    connectToWifi();
+    server.begin();
+  #endif
+  
   led_light(GREEN);
-} 
+}
 
 void loop() {
+  #ifdef WIFI
+    for(;;){
+      wifiLoop();
+    }
+  #else
+    for(;;){
+      serialLoop();
+    }
+  #endif
+}
+
+void serialLoop(){
   if(Serial.available()){
     int length = Serial.readBytesUntil('\n', buffer, bufferLen-1);
     buffer[length] = '\0';
     
     int commandLength = parseBuffer(length);
     processCommand(commandLength);
+    Logln();
+  }
+}
+
+void wifiLoop(){
+  client = server.available();
+  
+  if(client){
+    Serial.println("New Client");
+    client.println("CNC_plotter ready");
+    while(client.connected()){
+      if(client.available()){
+        int length = client.readBytesUntil('\n', buffer, bufferLen-1);
+        buffer[length] = '\0';
+    
+        int commandLength = parseBuffer(length);
+        processCommand(commandLength);
+        Logln();
+      }
+    }
+    Serial.println("Client disconnected");
   }
 }
 

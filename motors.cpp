@@ -8,7 +8,7 @@ Motor motor2;
 int motorSpeed;
 int motorDelay;
 
-void motor_setup(){
+void motorSetup(){
   motor1.enabled = 33;
   motor1.step = 25;
   motor1.dir = 26;
@@ -31,7 +31,7 @@ void motor_setup(){
   motorSetSpeed(35);
 }
 
-void motor_step(int steps){
+void motorStep(int steps){
   digitalWrite(motor1.dir, steps > 0 ? LOW:HIGH);
   digitalWrite(motor2.dir, steps > 0 ? LOW:HIGH);
   
@@ -49,7 +49,7 @@ void motor_step(int steps){
   }
 }
 
-void motor_power(bool on){
+void motorPower(bool on){
   led_light(on?YELLOW:GREEN);
   digitalWrite(motor1.enabled, !on);  //ENABLE pin needs to be low to turn off power
   digitalWrite(motor2.enabled, !on);
