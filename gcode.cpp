@@ -9,11 +9,12 @@ char buffer[bufferLen];
 Field command[commandLen];
 
 void processCommand(int commandLength) {
+  printCommand(commandLength);
   for(int i = 0; i < commandLength; i++){
-      Log(String(command[i].letter));
-      Logln(command[i].num, 3);
-      
       switch(command[i].letter) {
+        case 'G':
+          gCommand(command[i].num, commandLength);
+          break;
         case 'S':
           moveServo(command[i].num);
           break;
@@ -26,11 +27,38 @@ void processCommand(int commandLength) {
         case 'P':
           motorPower(command[i].num);
           break;
-        default:
-          Logln("Gcode command not recognized");
-          break;
       }
   }
+  Println("OK");
+}
+
+void gCommand(double num, int commandLength) {
+  if(num != 1 && num != 2){
+    Logln("gcommand not implemented");
+    return;
+  }
+
+  if(num == 1){
+    
+  }
+  
+  Logln("Line motion");
+  
+  double newX = 0, newY = 0;
+  for(int i = 0; i < commandLength; i++){
+    if(command[i].letter == 'X'){
+        newX = command[i].num;
+    }else if(command[i].letter == 'Y')
+        newY = command[i].num;
+     else if(command[i].letter == 'Z'){
+        if(command[i].num >= 0){
+          moveServo(UP);
+        }else{
+          moveServo(DOWN);
+        }
+     }
+  }
+  plotLine(newX, newY);
 }
 
 int parseBuffer(int bufferLength){
@@ -72,4 +100,11 @@ int parseBuffer(int bufferLength){
     }
   }
   return commandLength;
+}
+
+void printCommand(int commandLength) {
+  for(int i = 0; i < commandLength; i++){
+    Log(String(command[i].letter) + String(command[i].num, 4));
+  }
+  Logln();
 }

@@ -13,3 +13,5 @@ extern Field command[commandLen];
 
 int parseBuffer(int);
 void processCommand(int);
+void gCommand(double, int);
+void printCommand(int);
