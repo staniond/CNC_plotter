@@ -27,6 +27,9 @@ void processCommand(int commandLength) {
         case 'E':
           motorPower(command[i].num);
           break;
+        case 'R':
+          ESP.restart();
+          break;
       }
   }
   Println("ok");
