@@ -14,13 +14,13 @@ int xPos = 0;
 int yPos = 0;
 
 void motorSetup(){
-  motor1.enabled = 33;
-  motor1.step = 25;
-  motor1.dir = 26;
+  motor1.enabled = 27;
+  motor1.step = 14;
+  motor1.dir = 12;
   
-  motor2.enabled = 27;
-  motor2.step = 14;
-  motor2.dir = 12;
+  motor2.enabled = 33;
+  motor2.step = 25;
+  motor2.dir = 26;
 
   pinMode(motor1.step, OUTPUT);
   pinMode(motor1.enabled, OUTPUT);
