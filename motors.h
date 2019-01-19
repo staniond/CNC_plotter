@@ -16,12 +16,12 @@ const int maxSteps = 4240;
 const int maxRangeMM = 40;
 const int stepsPerMM = maxSteps/maxRangeMM;
 
-const int maxSpeed = 3000; //mm/min
+const int maxSpeed = 3000; // mm/min
 const int normalSpeed = 1200;
 
 void motorSetup();
 void motorStep(int);
-void motorSetSpeed(int);
+void motorSetSpeed(int);  // mm/min
 void motorPower(bool);
 void motorPower();
 void plotLine(double, double);

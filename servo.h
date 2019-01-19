@@ -8,3 +8,5 @@ extern int servoPaper;
 
 void servoSetup();
 void moveServo(int);
+void servoAttach();
+void servoDetach();

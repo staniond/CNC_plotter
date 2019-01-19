@@ -18,14 +18,8 @@ void processCommand(int commandLength) {
         case 'S':
           sCommand(command[i].num, commandLength);
           break;
-        case 'M':
-          motorSetSpeed(command[i].num);
-          break;
-        case 'N':
-          motorStep(command[i].num);
-          break;
         case 'E':
-          motorPower(command[i].num);
+          eCommand(command[i].num, commandLength);
           break;
         case 'R':
           ESP.restart();
@@ -64,7 +58,7 @@ void gCommand(double num, int commandLength) {
         if(command[i].num >= 0){
           moveServo(UP);
         }else{
-          moveServo(DOWN);
+          moveServo(servoPaper);
         }
      }else if(command[i].letter == 'F'){
        feedRate = command[i].num;
@@ -78,6 +72,16 @@ void gCommand(double num, int commandLength) {
 
 void sCommand(double num, int commandLength){
   moveServo(num);
+}
+
+void eCommand(double num, int commandLength){
+  if(num){
+    motorPower(HIGH);
+    servoAttach();
+  }else{
+    motorPower(LOW);
+    servoDetach();
+  }
 }
 
 int parseBuffer(int bufferLength){

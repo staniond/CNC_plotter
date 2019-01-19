@@ -15,4 +15,5 @@ int parseBuffer(int);
 void processCommand(int);
 void gCommand(double, int);
 void sCommand(double, int);
+void eCommand(double, int);
 void printCommand(int);

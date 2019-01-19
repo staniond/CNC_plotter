@@ -2,17 +2,29 @@
 #include "servo.h"
 
 Servo servo;
-const int servoPin = 32;
-const int servoDown = 110; //all the way down
-const int servoUp = 20; //all the way up
 
-int servoPaper = servoUp; //needs settings
+const int servoPwmMin = 1000;
+const int servoPwmMax = 2000;
+
+const int servoPin = 32;
+const int servoDown = 140; //all the way down
+const int servoUp = 40; //all the way up
 
 int servoPos = 0; //in percent - 0 is down
+int servoPaper = 0; //needs settings
 
 void servoSetup(){
-  servo.attach(servoPin);
+  servoAttach();
   moveServo(UP);
+  servoDetach();
+}
+
+void servoAttach() {
+  servo.attach(servoPin);
+}
+
+void servoDetach() {
+  servo.detach();
 }
 
 
@@ -24,7 +36,7 @@ void moveServo(int percent){
   
   
   servo.write(pos);
-  delayMicroseconds(350000);
+  delayMicroseconds(500000);
   
   Logln("Pen set to " + String(percent) + " percent height");
 }
