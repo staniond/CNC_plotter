@@ -1,6 +1,6 @@
 #pragma once
 #include <WiFi.h>
-
+//  TODO debug through serial, gcode through wifi
 #define WIFI
 #define DEBUG
 
