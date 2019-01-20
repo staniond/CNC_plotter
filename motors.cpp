@@ -74,7 +74,7 @@ void plotLine(double xPosMM, double yPosMM) {
 
   xPos = newX;
   yPos = newY;
-  Logln(String("New pos - ") + String(xPos) + ", " + String(yPos));
+  Serial.println(String("New pos - ") + String(xPos) + ", " + String(yPos));
 }
 
 void lineHigh(int x0, int y0, int x1, int y1){
@@ -155,7 +155,7 @@ void motorPower(bool on){
   digitalWrite(motor2.enabled, !on);
   delayMicroseconds(5);
   powerEnabled = on;
-  Logln("Motor power switched " + String(on?"ON":"OFF"));
+  Serial.println("Motor power switched " + String(on?"ON":"OFF"));
 }
 
 void motorPower(){
@@ -171,5 +171,5 @@ void motorSetSpeed(int speed){
   
   motorSpeed = speed;
   motorDelay = (60 * 1000000)/(speed * 106);
-  Logln("Motor speed set to " + String(speed) + " mm/sec");
+  Serial.println("Motor speed set to " + String(speed) + " mm/sec");
 }

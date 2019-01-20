@@ -28,38 +28,13 @@ void setup() {
 
   Serial.println("Booted");
   
-  #ifdef WIFI
-    connectToWifi();
-    server.begin();
-  #endif
+  connectToWifi();
+  server.begin();
   
   led_light(GREEN);
 }
 
 void loop() {
-  #ifdef WIFI
-    for(;;){
-      wifiLoop();
-    }
-  #else
-    for(;;){
-      serialLoop();
-    }
-  #endif
-}
-
-void serialLoop(){
-  if(Serial.available()){
-    int length = Serial.readBytesUntil('\n', buffer, bufferLen-1);
-    buffer[length] = '\0';
-    
-    int commandLength = parseBuffer(length);
-    processCommand(commandLength);
-    Logln();
-  }
-}
-
-void wifiLoop(){
   client = server.available();
   
   if(client){
@@ -73,7 +48,7 @@ void wifiLoop(){
     
         int commandLength = parseBuffer(length);
         processCommand(commandLength);
-        Logln();
+        Serial.println();
       }
     }
     Serial.println("Client disconnected");
@@ -94,7 +69,7 @@ void connectToWifi(){
         led_light(NONE);
         Serial.print(".");
     }
-    Serial.println("");
+    Serial.println();
     Serial.println("WiFi connected");
     Serial.println("IP address: ");
     Serial.print(WiFi.localIP());

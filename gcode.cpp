@@ -10,124 +10,124 @@ Field command[commandLen];
 
 void processCommand(int commandLength) {
   printCommand(commandLength);
-  for(int i = 0; i < commandLength; i++){
-      switch(command[i].letter) {
-        case 'G':
-          gCommand(command[i].num, commandLength);
-          break;
-        case 'S':
-          sCommand(command[i].num, commandLength);
-          break;
-        case 'E':
-          eCommand(command[i].num, commandLength);
-          break;
-        case 'R':
-          ESP.restart();
-          break;
-      }
+  for (int i = 0; i < commandLength; i++) {
+    switch (command[i].letter) {
+      case 'G':
+        gCommand(command[i].num, commandLength);
+        break;
+      case 'S':
+        sCommand(command[i].num, commandLength);
+        break;
+      case 'E':
+        eCommand(command[i].num, commandLength);
+        break;
+      case 'R':
+        ESP.restart();
+        break;
+    }
   }
-  Println("ok");
+  client.println("ok");
   client.flush();
 }
 
 void gCommand(double num, int commandLength) {
   boolean move = false;
-  if(num != 0 && num != 1){
-    Logln("gcommand not implemented");
+  if (num != 0 && num != 1) {
+    Serial.println("gcommand not implemented");
     return;
   }
-  
+
   double feedRate = normalSpeed;
-  if(num == 0){
-      feedRate = maxSpeed;
-  }else if(num == 1){
-      feedRate = normalSpeed;
+  if (num == 0) {
+    feedRate = maxSpeed;
+  } else if (num == 1) {
+    feedRate = normalSpeed;
   }
-  
-  Logln("Line motion");
-  
+
+  Serial.println("Line motion");
+
   double newX = 0, newY = 0;
-  for(int i = 0; i < commandLength; i++){
-    if(command[i].letter == 'X'){
-        newX = command[i].num;
-        move = true;
-    }else if(command[i].letter == 'Y'){
-        newY = command[i].num;
-        move = true;
-    }else if(command[i].letter == 'Z'){
-        if(command[i].num >= 0){
-          moveServo(UP);
-        }else{
-          moveServo(servoPaper);
-        }
-     }else if(command[i].letter == 'F'){
-       feedRate = command[i].num;
-     }
+  for (int i = 0; i < commandLength; i++) {
+    if (command[i].letter == 'X') {
+      newX = command[i].num;
+      move = true;
+    } else if (command[i].letter == 'Y') {
+      newY = command[i].num;
+      move = true;
+    } else if (command[i].letter == 'Z') {
+      if (command[i].num >= 0) {
+        moveServo(UP);
+      } else {
+        moveServo(servoPaper);
+      }
+    } else if (command[i].letter == 'F') {
+      feedRate = command[i].num;
+    }
   }
   motorSetSpeed(feedRate);
-  if(move){
-      plotLine(newX, newY); 
+  if (move) {
+    plotLine(newX, newY);
   }
 }
 
-void sCommand(double num, int commandLength){
+void sCommand(double num, int commandLength) {
   moveServo(num);
 }
 
-void eCommand(double num, int commandLength){
-  if(num){
+void eCommand(double num, int commandLength) {
+  if (num) {
     motorPower(HIGH);
     servoAttach();
-  }else{
+  } else {
     motorPower(LOW);
     servoDetach();
   }
 }
 
-int parseBuffer(int bufferLength){
+int parseBuffer(int bufferLength) {
   int commandLength = 0;
-  for(int i = 0; i < bufferLength; i++){
-    if(commandLength >= commandLen){
+  for (int i = 0; i < bufferLength; i++) {
+    if (commandLength >= commandLen) {
       break;
     }
-    if(buffer[i] == ';'){ //skip ; comment
+    if (buffer[i] == ';') { //skip ; comment
       break;
-    }else if(buffer[i] == '('){ //skip () comment
-      while(++i<bufferLength){
-        if(buffer[i] == ')'){
+    } else if (buffer[i] == '(') { //skip () comment
+      while (++i < bufferLength) {
+        if (buffer[i] == ')') {
           i++;
-          if(i >= bufferLength)
+          if (i >= bufferLength)
             return commandLength;
           break;
         }
       }
-    }else if(buffer[i] == ' '){ //skip whitespaces
+    } else if (buffer[i] == ' ') { //skip whitespaces
       continue;
     }
-    if(isAlpha(buffer[i])){
+    if (isAlpha(buffer[i])) {
       command[commandLength].letter = buffer[i];
       command[commandLength].num = atof(&buffer[++i]);
-      while(i<bufferLength){
-        if(isDigit(buffer[i]) || buffer[i] == '.' || buffer[i] == ' ' || buffer[i] == '-' || buffer[i] == '+'){
+      while (i < bufferLength) {
+        if (isDigit(buffer[i]) || buffer[i] == '.' || buffer[i] == ' ' || buffer[i] == '-' || buffer[i] == '+') {
           i++;
           continue;
         }
-        else{
+        else {
           i--;
-          break; 
+          break;
         }
       }
       commandLength++;
-    }else{
-      Logln("WTF?");
+    } else {
+      Serial.println("WTF?");
     }
   }
   return commandLength;
 }
 
 void printCommand(int commandLength) {
-  for(int i = 0; i < commandLength; i++){
-    Log(String(command[i].letter) + String(command[i].num, 4));
+  for (int i = 0; i < commandLength; i++) {
+    Serial.print(String(command[i].letter) + String(command[i].num, 4));
   }
-  Logln();
+  Serial.println();
 }
