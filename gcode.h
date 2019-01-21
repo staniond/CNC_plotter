@@ -11,12 +11,12 @@ typedef struct Command {
 } Command;
 
 const int bufferLen = 128;
-const int commandLen = 10;
+const int commandLen = 20;
 
 extern char buffer[bufferLen];
 
 Command* parseBuffer(int);
-void processCommand(Command*);
+void processCommands(void*);
 void gCommand(Command*, int);
 void sCommand(Command*, int);
 void eCommand(Command*, int);

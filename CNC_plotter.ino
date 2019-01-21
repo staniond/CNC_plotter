@@ -33,6 +33,17 @@ void setup() {
   server.begin();
 
   queue = xQueueCreate(queueSize, sizeof(Command*));
+  if(queue == NULL){
+    Serial.println("Error creating the queue");
+    ESP.restart();
+  }
+
+  xTaskCreate(      processCommands,   /* Function to implement the task */
+                    "processCommandsTask", /* Name of the task */
+                    1500,      /* Stack size in words */
+                    NULL,       /* Task input parameter */
+                    taskPriority, /* Priority of the task */
+                    NULL);  /* Task handle */
   
   led_light(GREEN);
 }
@@ -50,8 +61,9 @@ void loop() {
         buffer[length] = '\0';
     
         Command *command = parseBuffer(length);
-        processCommand(command);
-        Serial.println();
+        xQueueSend(queue, &command, portMAX_DELAY);
+        client.println("ok");
+        client.flush();
       }
     }
     Serial.println("Client disconnected");
@@ -77,4 +89,13 @@ void connectToWifi(){
     Serial.println("IP address: ");
     Serial.print(WiFi.localIP());
     Serial.println(":" + String(port));
+}
+
+void restart() {
+  plotLine(0, 0);
+  moveServo(UP);
+  motorPower(LOW);
+  servoDetach();
+
+  Serial.println("Reset complete");
 }

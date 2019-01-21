@@ -7,36 +7,42 @@
 
 char buffer[bufferLen];
 
-void processCommand(Command *command) {
-  printCommand(command);
-  for (int i = 0; i < command->size; i++) {
-    switch (command->fields[i].letter) {
-      case 'G':
-        gCommand(command, command->fields[i].num);
-        break;
-      case 'S':
-        sCommand(command, command->fields[i].num);
-        break;
-      case 'E':
-        eCommand(command, command->fields[i].num);
-        break;
-      case 'R':
-        ESP.restart();
-        break;
-    }
-  };
+void processCommands(void *parameters) {
+  for(;;){
+    Command *command;
+    xQueueReceive(queue, &command, portMAX_DELAY);
+    printCommand(command);
+    
+    for (int i = 0; i < command->size; i++) {
+      switch (command->fields[i].letter) {
+        case 'G':
+          gCommand(command, command->fields[i].num);
+          break;
+        case 'S':
+          sCommand(command, command->fields[i].num);
+          break;
+        case 'E':
+          eCommand(command, command->fields[i].num);
+          break;
+        case 'R':
+          restart();
+          break;
+      }
+    };
+  
+    free(command->fields);
+    free(command);
 
-  free(command->fields);
-  free(command);
-
-  client.println("ok");
-  client.flush();
+    Serial.println("Gcode succesfully executed");
+    Serial.println(String("Free spaces in command queue: ") + String(uxQueueSpacesAvailable(queue)));
+    Serial.println();
+  }
 }
 
 void gCommand(Command *command, int num) {
   boolean move = false;
   if (num != 0 && num != 1) {
-    Serial.println("gcommand not implemented");
+    Serial.println("Gcode command not implemented");
     return;
   }
 

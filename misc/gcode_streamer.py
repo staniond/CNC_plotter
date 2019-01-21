@@ -44,7 +44,7 @@ s.write("\r\n\r\n")
 time.sleep(2)   # Wait for grbl to initialize 
 s.flushInput()  # Flush startup text in serial input
 
-print 'Sending: E1'
+print 'Sending: E1',
 s.write('E1\n')
 grbl_out = s.readline()
 print ' : ' + grbl_out.strip()
@@ -57,11 +57,11 @@ for line in f:
     grbl_out = s.readline() # Wait for grbl response with carriage return
     print ' : ' + grbl_out.strip()
 
-print 'Sending: E0'
+print 'Sending: E0',
 s.write('E0\n')
 grbl_out = s.readline()
 print ' : ' + grbl_out.strip()
-print 'Sending: R'
+print 'Sending: R',
 s.write('R\n')
 grbl_out = s.readline()
 print ' : ' + grbl_out.strip()
