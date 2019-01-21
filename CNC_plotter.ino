@@ -38,23 +38,23 @@ void setup() {
     ESP.restart();
   }
 
-//  xTaskCreatePinnedToCore(      
-//                    processCommands,   /* Function to implement the task */
-//                    "processCommandsTask", /* Name of the task */
-//                    1500,      /* Stack size in bytes */
-//                    NULL,       /* Task input parameter */
-//                    taskPriority, /* Priority of the task */
-//                    NULL,  /* Task handle */
-//                    taskCore);  /* Core where the task should run */
+  xTaskCreatePinnedToCore(      
+                    processCommands,   /* Function to implement the task */
+                    "processCommandsTask", /* Name of the task */
+                    1500,      /* Stack size in bytes */
+                    NULL,       /* Task input parameter */
+                    taskPriority, /* Priority of the task */
+                    NULL,  /* Task handle */
+                    taskCore);  /* Core where the task should run */
 
 
-  xTaskCreate(
-                  processCommands,   /* Function to implement the task */
-                  "processCommandsTask", /* Name of the task */
-                  1500,      /* Stack size in bytes */
-                  NULL,       /* Task input parameter */
-                  taskPriority, /* Priority of the task */
-                  NULL);  /* Task handle */
+//  xTaskCreate(
+//                  processCommands,   /* Function to implement the task */
+//                  "processCommandsTask", /* Name of the task */
+//                  1500,      /* Stack size in bytes */
+//                  NULL,       /* Task input parameter */
+//                  taskPriority, /* Priority of the task */
+//                  NULL);  /* Task handle */
   
   led_light(GREEN);
 }
@@ -85,8 +85,10 @@ void connectToWifi(){
 //TODO check if still connected, reconnect if not    
     Serial.print("Connecting to ");
     Serial.println(ssid);
-
+    
+    WiFi.mode (WIFI_STA);
     WiFi.begin(ssid, password);
+    
 
     while (WiFi.status() != WL_CONNECTED) {
         delay(250);
