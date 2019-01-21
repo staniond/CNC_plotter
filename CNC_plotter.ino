@@ -38,12 +38,23 @@ void setup() {
     ESP.restart();
   }
 
-  xTaskCreate(      processCommands,   /* Function to implement the task */
-                    "processCommandsTask", /* Name of the task */
-                    1500,      /* Stack size in words */
-                    NULL,       /* Task input parameter */
-                    taskPriority, /* Priority of the task */
-                    NULL);  /* Task handle */
+//  xTaskCreatePinnedToCore(      
+//                    processCommands,   /* Function to implement the task */
+//                    "processCommandsTask", /* Name of the task */
+//                    1500,      /* Stack size in bytes */
+//                    NULL,       /* Task input parameter */
+//                    taskPriority, /* Priority of the task */
+//                    NULL,  /* Task handle */
+//                    taskCore);  /* Core where the task should run */
+
+
+  xTaskCreate(
+                  processCommands,   /* Function to implement the task */
+                  "processCommandsTask", /* Name of the task */
+                  1500,      /* Stack size in bytes */
+                  NULL,       /* Task input parameter */
+                  taskPriority, /* Priority of the task */
+                  NULL);  /* Task handle */
   
   led_light(GREEN);
 }
@@ -92,8 +103,8 @@ void connectToWifi(){
 }
 
 void restart() {
-  plotLine(0, 0);
   moveServo(UP);
+  plotLine(0, 0);
   motorPower(LOW);
   servoDetach();
 

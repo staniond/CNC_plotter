@@ -34,7 +34,7 @@ void processCommands(void *parameters) {
     free(command);
 
     Serial.println("Gcode succesfully executed");
-    Serial.println(String("Free spaces in command queue: ") + String(uxQueueSpacesAvailable(queue)));
+    Serial.println(String("Free spaces in command queue: ") + String(uxQueueSpacesAvailable(queue)) + ", Free bytes in heap: " + String(ESP.getFreeHeap())); 
     Serial.println();
   }
 }
