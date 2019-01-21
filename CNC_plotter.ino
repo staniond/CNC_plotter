@@ -104,6 +104,7 @@ void connectToWifi(){
 
 void restart() {
   moveServo(UP);
+  motorSetSpeed(maxSpeed);
   plotLine(0, 0);
   motorPower(LOW);
   servoDetach();
