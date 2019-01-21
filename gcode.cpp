@@ -6,31 +6,34 @@
 
 
 char buffer[bufferLen];
-Field command[commandLen];
 
-void processCommand(int commandLength) {
-  printCommand(commandLength);
-  for (int i = 0; i < commandLength; i++) {
-    switch (command[i].letter) {
+void processCommand(Command *command) {
+  printCommand(command);
+  for (int i = 0; i < command->size; i++) {
+    switch (command->fields[i].letter) {
       case 'G':
-        gCommand(command[i].num, commandLength);
+        gCommand(command, command->fields[i].num);
         break;
       case 'S':
-        sCommand(command[i].num, commandLength);
+        sCommand(command, command->fields[i].num);
         break;
       case 'E':
-        eCommand(command[i].num, commandLength);
+        eCommand(command, command->fields[i].num);
         break;
       case 'R':
         ESP.restart();
         break;
     }
-  }
+  };
+
+  free(command->fields);
+  free(command);
+
   client.println("ok");
   client.flush();
 }
 
-void gCommand(double num, int commandLength) {
+void gCommand(Command *command, int num) {
   boolean move = false;
   if (num != 0 && num != 1) {
     Serial.println("gcommand not implemented");
@@ -47,21 +50,21 @@ void gCommand(double num, int commandLength) {
   Serial.println("Line motion");
 
   double newX = 0, newY = 0;
-  for (int i = 0; i < commandLength; i++) {
-    if (command[i].letter == 'X') {
-      newX = command[i].num;
+  for (int i = 0; i < command->size; i++) {
+    if (command->fields[i].letter == 'X') {
+      newX = command->fields[i].num;
       move = true;
-    } else if (command[i].letter == 'Y') {
-      newY = command[i].num;
+    } else if (command->fields[i].letter == 'Y') {
+      newY = command->fields[i].num;
       move = true;
-    } else if (command[i].letter == 'Z') {
-      if (command[i].num >= 0) {
+    } else if (command->fields[i].letter == 'Z') {
+      if (command->fields[i].num >= 0) {
         moveServo(UP);
       } else {
         moveServo(servoPaper);
       }
-    } else if (command[i].letter == 'F') {
-      feedRate = command[i].num;
+    } else if (command->fields[i].letter == 'F') {
+      feedRate = command->fields[i].num;
     }
   }
   motorSetSpeed(feedRate);
@@ -70,11 +73,11 @@ void gCommand(double num, int commandLength) {
   }
 }
 
-void sCommand(double num, int commandLength) {
+void sCommand(Command *command, int num) {
   moveServo(num);
 }
 
-void eCommand(double num, int commandLength) {
+void eCommand(Command *command, int num) {
   if (num) {
     motorPower(HIGH);
     servoAttach();
@@ -84,10 +87,13 @@ void eCommand(double num, int commandLength) {
   }
 }
 
-int parseBuffer(int bufferLength) {
-  int commandLength = 0;
+Command* parseBuffer(int bufferLength) {
+  int size = 0;
+  Command *command = (Command*) malloc(sizeof(Command));
+  command->fields = (Field*) malloc(sizeof(Field) * commandLen);
+  
   for (int i = 0; i < bufferLength; i++) {
-    if (commandLength >= commandLen) {
+    if (size >= commandLen) {
       break;
     }
     if (buffer[i] == ';') { //skip ; comment
@@ -97,7 +103,8 @@ int parseBuffer(int bufferLength) {
         if (buffer[i] == ')') {
           i++;
           if (i >= bufferLength)
-            return commandLength;
+            command->size = size;
+            return command;
           break;
         }
       }
@@ -105,8 +112,8 @@ int parseBuffer(int bufferLength) {
       continue;
     }
     if (isAlpha(buffer[i])) {
-      command[commandLength].letter = buffer[i];
-      command[commandLength].num = atof(&buffer[++i]);
+      command->fields[size].letter = buffer[i];
+      command->fields[size].num = atof(&buffer[++i]);
       while (i < bufferLength) {
         if (isDigit(buffer[i]) || buffer[i] == '.' || buffer[i] == ' ' || buffer[i] == '-' || buffer[i] == '+') {
           i++;
@@ -117,17 +124,18 @@ int parseBuffer(int bufferLength) {
           break;
         }
       }
-      commandLength++;
+      size++;
     } else {
       Serial.println("WTF?");
     }
   }
-  return commandLength;
+  command->size = size;
+  return command;;
 }
 
-void printCommand(int commandLength) {
-  for (int i = 0; i < commandLength; i++) {
-    Serial.print(String(command[i].letter) + String(command[i].num, 4));
+void printCommand(Command *command) {
+  for (int i = 0; i < command->size; i++) {
+    Serial.print(String(command->fields[i].letter) + " " + String(command->fields[i].num, 4));
   }
   Serial.println();
 }

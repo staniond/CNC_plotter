@@ -20,7 +20,6 @@ const int maxSpeed = 3000; // mm/min
 const int normalSpeed = 1200;
 
 void motorSetup();
-void motorStep(int);
 void motorSetSpeed(int);  // mm/min
 void motorPower(bool);
 void motorPower();

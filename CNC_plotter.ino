@@ -12,6 +12,7 @@ const int port = 8888;
 
 WiFiServer server(port);
 WiFiClient client;
+QueueHandle_t queue;
 
 void setup() {
   led_setup();
@@ -30,6 +31,8 @@ void setup() {
   
   connectToWifi();
   server.begin();
+
+  queue = xQueueCreate(queueSize, sizeof(Command*));
   
   led_light(GREEN);
 }
@@ -46,8 +49,8 @@ void loop() {
         int length = client.readBytesUntil('\n', buffer, bufferLen-1);
         buffer[length] = '\0';
     
-        int commandLength = parseBuffer(length);
-        processCommand(commandLength);
+        Command *command = parseBuffer(length);
+        processCommand(command);
         Serial.println();
       }
     }

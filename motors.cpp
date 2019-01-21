@@ -131,23 +131,6 @@ void lineLow(int x0, int y0, int x1, int y1){
   }
 }
 
-void motorStep(int steps){
-  digitalWrite(motor1.dir, steps > 0 ? LOW:HIGH);
-  digitalWrite(motor2.dir, steps > 0 ? LOW:HIGH);
-  
-  if(steps < 0){
-    steps = -steps;
-  }
-  
-  for(int i = 0; i < steps; i++) {
-    digitalWrite(motor1.step,HIGH);
-    digitalWrite(motor2.step,HIGH);
-    delayMicroseconds(5);
-    digitalWrite(motor1.step,LOW);
-    digitalWrite(motor2.step,LOW);
-    delayMicroseconds(motorDelay-5);
-  }
-}
 
 void motorPower(bool on){
   led_light(on?YELLOW:GREEN);

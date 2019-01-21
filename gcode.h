@@ -5,15 +5,19 @@ typedef struct Field {
   double num;
 } Field;
 
+typedef struct Command {
+  int size;
+  Field *fields;
+} Command;
+
 const int bufferLen = 128;
 const int commandLen = 10;
 
 extern char buffer[bufferLen];
-extern Field command[commandLen];
 
-int parseBuffer(int);
-void processCommand(int);
-void gCommand(double, int);
-void sCommand(double, int);
-void eCommand(double, int);
-void printCommand(int);
+Command* parseBuffer(int);
+void processCommand(Command*);
+void gCommand(Command*, int);
+void sCommand(Command*, int);
+void eCommand(Command*, int);
+void printCommand(Command*);
