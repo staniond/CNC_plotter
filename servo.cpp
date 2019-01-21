@@ -30,14 +30,17 @@ void servoDetach() {
 
 void moveServo(int percent){
   percent = constrain(percent, 0, 100);
+  if(servoPos == percent){
+    return;
+  }
   servoPos = percent;
   
   int pos = map(percent, 0, 100, servoDown, servoUp);
   
   
   servo.write(pos);
-//  delayMicroseconds(500000);
-  vTaskDelay(servoDelay);
+  delay(500);
+//  vTaskDelay(servoDelay);
   
   Serial.println("Pen set to " + String(percent) + " percent height");
 }
