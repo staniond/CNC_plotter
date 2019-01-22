@@ -7,7 +7,7 @@
 
 char buffer[bufferLen];
 
-void processCommands(void *parameters) {
+void processCommands() {
   for(;;){
     Command *command;
     xQueueReceive(queue, &command, portMAX_DELAY);

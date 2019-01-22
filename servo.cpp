@@ -39,8 +39,7 @@ void moveServo(int percent){
   
   
   servo.write(pos);
-  delay(500);
-//  vTaskDelay(servoDelay);
+  vTaskDelay(servoDelay);
   
   Serial.println("Pen set to " + String(percent) + " percent height");
 }

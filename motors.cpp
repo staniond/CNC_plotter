@@ -54,7 +54,8 @@ void plotLine(double xPosMM, double yPosMM) {
   }else{
     digitalWrite(motor2.dir, LOW);
   }
-  
+
+  vTaskSuspendAll();
   if (abs(newY - yPos) < abs(newX - xPos)){
     if (xPos > newX){
         lineLow(newX, newY, xPos, yPos);
@@ -71,6 +72,7 @@ void plotLine(double xPosMM, double yPosMM) {
           lineHigh(xPos, yPos, newX, newY);
       }
   }
+  xTaskResumeAll();
 
   xPos = newX;
   yPos = newY;

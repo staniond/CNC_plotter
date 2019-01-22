@@ -38,46 +38,54 @@ void setup() {
     ESP.restart();
   }
 
-  xTaskCreatePinnedToCore(      
-                    processCommands,   /* Function to implement the task */
-                    "processCommandsTask", /* Name of the task */
-                    1500,      /* Stack size in bytes */
-                    NULL,       /* Task input parameter */
-                    taskPriority, /* Priority of the task */
-                    NULL,  /* Task handle */
-                    taskCore);  /* Core where the task should run */
+//  xTaskCreatePinnedToCore(      
+//                    processCommandsLoop,   /* Function to implement the task */
+//                    "processCommandsTask", /* Name of the task */
+//                    1500,      /* Stack size in bytes */
+//                    NULL,       /* Task input parameter */
+//                    taskPriority, /* Priority of the task */
+//                    NULL,  /* Task handle */
+//                    taskCore);  /* Core where the task should run */
 
 
-//  xTaskCreate(
-//                  processCommands,   /* Function to implement the task */
-//                  "processCommandsTask", /* Name of the task */
-//                  1500,      /* Stack size in bytes */
-//                  NULL,       /* Task input parameter */
-//                  taskPriority, /* Priority of the task */
-//                  NULL);  /* Task handle */
+  xTaskCreate(
+                  processCommandsLoop,   /* Function to implement the task */
+                  "processCommandsTask", /* Name of the task */
+                  1500,      /* Stack size in bytes */
+                  NULL,       /* Task input parameter */
+                  taskPriority, /* Priority of the task */
+                  NULL);  /* Task handle */
   
   led_light(GREEN);
 }
 
 void loop() {
-  client = server.available();
-  
-  if(client){
-    Serial.println("New Client");
-    client.println("Grbl 1.1 ['$' for help]");
-    client.flush();
-    while(client.connected()){
-      if(client.available()){
-        int length = client.readBytesUntil('\n', buffer, bufferLen-1);
-        buffer[length] = '\0';
+  processCommands();
+}
+
+void processCommandsLoop(void *parameters) {
+  for(;;) {
+    client = server.available();
     
-        Command *command = parseBuffer(length);
-        xQueueSend(queue, &command, portMAX_DELAY);
-        client.println("ok");
-        client.flush();
+    if(client){
+      Serial.println("New Client");
+      client.println("Grbl 1.1 ['$' for help]");
+      client.flush();
+      while(client.connected()){
+        if(client.available()){
+          int length = client.readBytesUntil('\n', buffer, bufferLen-1);
+          buffer[length] = '\0';
+      
+          Command *command = parseBuffer(length);
+          xQueueSend(queue, &command, portMAX_DELAY);
+          client.println("ok");
+          client.flush();
+          vTaskDelay(1/portTICK_PERIOD_MS);
+        }
       }
+      Serial.println("Client disconnected");
     }
-    Serial.println("Client disconnected");
+    vTaskDelay(1/portTICK_PERIOD_MS);
   }
 }
 
@@ -87,8 +95,8 @@ void connectToWifi(){
     Serial.println(ssid);
     
     WiFi.mode (WIFI_STA);
+    WiFi.setSleep(false);
     WiFi.begin(ssid, password);
-    
 
     while (WiFi.status() != WL_CONNECTED) {
         delay(250);

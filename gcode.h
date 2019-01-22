@@ -16,7 +16,7 @@ const int commandLen = 20;
 extern char buffer[bufferLen];
 
 Command* parseBuffer(int);
-void processCommands(void*);
+void processCommands();
 void gCommand(Command*, int);
 void sCommand(Command*, int);
 void eCommand(Command*, int);
