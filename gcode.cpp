@@ -46,11 +46,11 @@ void gCommand(Command *command, int num) {
     return;
   }
 
-  double feedRate = normalSpeed;
+  double feed = normalSpeed;
   if (num == 0) {
-    feedRate = maxSpeed;
+    feed = maxSpeed;
   } else if (num == 1) {
-    feedRate = normalSpeed;
+    feed = normalSpeed;
   }
 
   Serial.println("Line motion");
@@ -70,12 +70,11 @@ void gCommand(Command *command, int num) {
         moveServo(servoPaper);
       }
     } else if (command->fields[i].letter == 'F') {
-      feedRate = command->fields[i].num;
+      feed = command->fields[i].num;
     }
   }
-  motorSetSpeed(feedRate);
   if (move) {
-    plotLine(newX, newY);
+    plotLine(newX, newY, feed);
   }
 }
 

@@ -6,8 +6,6 @@
 Motor motor1;
 Motor motor2;
 
-int motorSpeed;
-int motorDelay;
 bool powerEnabled = 0;
 
 int xPos = 0;
@@ -32,17 +30,16 @@ void motorSetup(){
 
   digitalWrite(motor1.enabled, HIGH); //turn off power to motors by default
   digitalWrite(motor2.enabled, HIGH);
-
-  motorSetSpeed(normalSpeed);
 }
 
-void plotLine(double xPosMM, double yPosMM) {
+void plotLine(double xPosMM, double yPosMM, int feed) {
   
   xPosMM = constrain(xPosMM, 0, maxRangeMM);
   yPosMM = constrain(yPosMM, 0, maxRangeMM);
   
   int newX = (int)(stepsPerMM)*xPosMM;
   int newY = (int)(stepsPerMM)*yPosMM;
+  int motorDelay = feedToDelay(feed);
 
   if(xPos>newX){
     digitalWrite(motor1.dir, HIGH);
@@ -58,18 +55,18 @@ void plotLine(double xPosMM, double yPosMM) {
   vTaskSuspendAll();
   if (abs(newY - yPos) < abs(newX - xPos)){
     if (xPos > newX){
-        lineLow(newX, newY, xPos, yPos);
+        lineLow(newX, newY, xPos, yPos, motorDelay);
     }
     else{
-        lineLow(xPos, yPos, newX, newY);
+        lineLow(xPos, yPos, newX, newY, motorDelay);
     }
   }
   else{
       if (yPos > newY){;
-          lineHigh(newX, newY, xPos, yPos);
+          lineHigh(newX, newY, xPos, yPos, motorDelay);
       }
       else{
-          lineHigh(xPos, yPos, newX, newY);
+          lineHigh(xPos, yPos, newX, newY, motorDelay);
       }
   }
   xTaskResumeAll();
@@ -79,7 +76,7 @@ void plotLine(double xPosMM, double yPosMM) {
   Serial.println(String("New pos - ") + String(xPos) + ", " + String(yPos));
 }
 
-void lineHigh(int x0, int y0, int x1, int y1){
+void lineHigh(int x0, int y0, int x1, int y1, int motorDelay){
   int dx = x1 - x0;
   int dy = y1 - y0;
   int xi = 1;
@@ -106,7 +103,7 @@ void lineHigh(int x0, int y0, int x1, int y1){
   }
 }
 
-void lineLow(int x0, int y0, int x1, int y1){
+void lineLow(int x0, int y0, int x1, int y1, int motorDelay){
   int dx = x1 - x0;
   int dy = y1 - y0;
   int yi = 1;
@@ -148,13 +145,12 @@ void motorPower(){
 }
   
 
-void motorSetSpeed(int speed){
-  speed = constrain(speed, speed, maxSpeed);
-  if(speed <= 0) {
-    speed = normalSpeed;
+int feedToDelay(int feed){
+  int motorDelay;
+  feed = constrain(feed, feed, maxSpeed);
+  if(feed <= 0) {
+    feed = normalSpeed;
   }
-  
-  motorSpeed = speed;
-  motorDelay = (60 * 1000000)/(speed * 106);
-  Serial.println("Motor speed set to " + String(speed) + " mm/sec");
+  motorDelay = (60 * 1000000)/(feed * 106);
+  return motorDelay;
 }
