@@ -1,12 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """\
 Simple g-code streaming script for grbl
 Provided as an illustration of the basic communication interface
 for grbl. When grbl has finished parsing the g-code block, it will
 return an 'ok' or 'error' response. When the planner buffer is full,
 grbl will not send a response until the planner buffer clears space.
-G02/03 arcs are special exceptions, where they inject short line 
-segments directly into the planner. So there may not be a response 
+G02/03 arcs are special exceptions, where they inject short line
+segments directly into the planner. So there may not be a response
 from grbl for the duration of the arc.
 ---------------------
 The MIT License (MIT)
@@ -32,44 +32,58 @@ THE SOFTWARE.
 import serial
 import time
 import sys
+import os
+import tqdm
 
-# Open grbl serial port
-s = serial.Serial('./ttyUSB0',115200)
 
-# Open g-code file
-f = open(sys.argv[1],'r');
+def main():
+    serial_path = './ttyUSB0'
 
-# Wake up grbl
-s.write("\r\n\r\n")
-time.sleep(2)   # Wait for grbl to initialize 
-s.flushInput()  # Flush startup text in serial input
+    if not os.path.isfile(sys.argv[1]):
+        print("ERROR: Given gcode file does not exist")
+        exit(2)
+    if len(sys.argv) == 3:
+        if not os.path.isfile(sys.argv[2]):
+            print("ERROR: Given serial device does not exist")
+            exit(2)
+        else:
+            serial_path = sys.argv[2]
+    if len(sys.argv) > 3:
+        print("Arguments - <gcode_path> [serial_device]")
+        exit(1)
 
-print 'Sending: E1',
-s.write('E1\n')
-grbl_out = s.readline()
-print ' : ' + grbl_out.strip()
+    with open(sys.argv[1]) as file:
+        lines = len(file.readlines())
 
-# Stream g-code to grbl
-for line in f:
-    l = line.strip() # Strip all EOL characters for consistency
-    print 'Sending: ' + l,
-    s.write(l + '\n') # Send g-code block to grbl
-    grbl_out = s.readline() # Wait for grbl response with carriage return
-    print ' : ' + grbl_out.strip()
+    # Open grbl serial port
+    with serial.Serial(serial_path, 115200) as s:
+        with open(sys.argv[1], 'r') as file:  # Open g-code file
+            s.write(b"\r\n\r\n")  # Wake up grbl
+            time.sleep(2)  # Wait for grbl to initialize
+            s.flushInput()  # Flush startup text in serial input
 
-print 'Sending: E0',
-s.write('E0\n')
-grbl_out = s.readline()
-print ' : ' + grbl_out.strip()
-print 'Sending: R',
-s.write('R\n')
-grbl_out = s.readline()
-print ' : ' + grbl_out.strip()
+            print(f"Connected to {serial_path}, sending data from {sys.argv[1]}:")
 
-# Close file and serial port
-f.close()
-s.close() 
+            s.write(b'E1\n')
+            s.readline()
 
-# Wait here until grbl is finished to close serial port and file.
-raw_input("  Press <Enter> to exit and disable grbl.") 
+            # Stream g-code to grbl
+            with tqdm.tqdm(total=lines) as pbar:
+                for line in file:
+                    stripped_line = line.strip()  # Strip all EOL characters for consistency
+                    s.write(stripped_line.encode() + b'\n')  # Send g-code block to grbl
+                    s.readline()  # Wait for grbl response with carriage return
+                    pbar.set_description(f"Processing")
+                    pbar.update(1)
 
+            s.write(b'E0\n')
+            s.readline()
+            s.write(b'R\n')
+            s.readline()
+
+    # Wait here until grbl is finished to close serial port and file.
+    input(" Press <Enter> to exit and disable grbl.")
+
+
+if __name__ == '__main__':
+    main()
