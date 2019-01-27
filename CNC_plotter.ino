@@ -13,6 +13,7 @@ const int port = 8888;
 WiFiServer server(port);
 WiFiClient client;
 QueueHandle_t queue;
+Preferences preferences;
 
 void setup() {
   led_setup();

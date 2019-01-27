@@ -79,6 +79,15 @@ void gCommand(Command *command, int num) {
 }
 
 void sCommand(Command *command, int num) {
+  for (int i = 0; i < command->size; i++) {
+    if(command->fields[i].letter == 'P') {
+      servoPaper = num;
+      preferences.begin("CNC_plotter", false);
+      preferences.putUInt(servoPreference, servoPaper);
+      preferences.end();
+      Serial.println("Saved new servo paper position - " + String(servoPaper) + "%");
+    }
+  }
   moveServo(num);
 }
 

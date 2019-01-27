@@ -10,10 +10,16 @@ const int servoPin = 32;
 const int servoDown = 140; //all the way down
 const int servoUp = 40; //all the way up
 
-int servoPos = 0; //in percent - 0 is down
-int servoPaper = 0; //needs settings
+int servoPos = DOWN; //in percent - 0 is down
+int servoPaper = DOWN; //needs settings
+
+const char* servoPreference = "servoPaper";
 
 void servoSetup(){
+  preferences.begin("CNC_plotter", false);
+  servoPaper = preferences.getUInt(servoPreference, DOWN);
+  preferences.end();
+  
   servoAttach();
   moveServo(UP);
   servoDetach();
