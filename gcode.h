@@ -21,3 +21,4 @@ void gCommand(Command*, int);
 void sCommand(Command*, int);
 void eCommand(Command*, int);
 void printCommand(Command*);
+Command* generateRCommand();

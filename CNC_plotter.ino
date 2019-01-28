@@ -85,6 +85,8 @@ void processCommandsLoop(void *parameters) {
         }
       }
       Serial.println("Client disconnected");
+      Command *rCommand = generateRCommand();
+      xQueueSend(queue, &rCommand, portMAX_DELAY);
     }
     vTaskDelay(1/portTICK_PERIOD_MS);
   }

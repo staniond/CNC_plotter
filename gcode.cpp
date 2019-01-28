@@ -139,12 +139,18 @@ Command* parseBuffer(int bufferLength) {
         }
       }
       size++;
+      if(size > commandLen) {
+        // TODO realloc more memory?
+        Serial.println("Gcode with more fields than allocated buffer (" + String(commandLen) + ")fields - restarting");
+        ESP.restart();
+      }
     } else {
       Serial.println("WTF?");
     }
   }
   command->size = size;
-  return command;;
+  command->fields = (Field*) realloc(command->fields, sizeof(Field) * size);
+  return command;
 }
 
 void printCommand(Command *command) {
@@ -152,4 +158,13 @@ void printCommand(Command *command) {
     Serial.print(String(command->fields[i].letter) + " " + String(command->fields[i].num, 4));
   }
   Serial.println();
+}
+
+Command* generateRCommand() {
+  Command *command = (Command*) malloc(sizeof(Command));
+  command->fields = (Field*) malloc(sizeof(Field) * 1);
+  command->size = 1;
+  command->fields[0].letter = 'R';
+  
+  return command;
 }
