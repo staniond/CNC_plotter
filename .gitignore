@@ -1,2 +1,5 @@
 misc/ttyUSB0
 *.swp
+build
+cmake-build-debug
+.idea
