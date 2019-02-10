@@ -33,6 +33,8 @@ void servo_setup() {
 }
 
 void move_servo(int percent) {
+    // TODO return if position would not change
+
     uint32_t duty_cycle = get_duty_cycle(percent);
     ESP_LOGI(TAG, "Moving servo to %d%%", percent);
 
