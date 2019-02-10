@@ -58,9 +58,7 @@ def main():
     # Open grbl serial port
     with serial.Serial(serial_path, 115200) as s:
         with open(sys.argv[1], 'r') as file:  # Open g-code file
-            s.write(b"\r\n\r\n")  # Wake up grbl
             time.sleep(2)  # Wait for grbl to initialize
-            s.flushInput()  # Flush startup text in serial input
 
             print(f"Connected to {serial_path}, sending data from {sys.argv[1]}:")
 
