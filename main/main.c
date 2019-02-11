@@ -46,9 +46,10 @@ void app_main() {
 
 void restart() {
     move_servo(SERVO_UP);
-    plot_line(0, 0, MAX_SPEED); // TODO
+    plot_line(0, 0, MAX_SPEED);
     motor_power(LOW);
     servo_detach();
+    set_fans(OFF);
 
     ESP_LOGI(TAG, "Reset complete");
 }
