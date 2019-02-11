@@ -3,7 +3,7 @@
 //
 
 #include <driver/gpio.h>
-#include "led.h"
+#include "leds.h"
 
 #define GPIO_OUTPUT_PIN_SEL  ((1ULL<<RED_LED_PIN) | (1ULL<<YELLOW_LED_PIN) | (1ULL<<GREEN_LED_PIN))
 

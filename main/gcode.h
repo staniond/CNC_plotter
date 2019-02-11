@@ -20,6 +20,7 @@ void process_commands();
 void g_command(Command*, int);
 void s_command(Command*, int);
 void e_command(Command*, int);
+void f_command(Command*, int);
 void print_command(Command *);
 Command* generate_R_command();
 

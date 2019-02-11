@@ -9,10 +9,11 @@
 
 #include "main.h"
 #include "wifi.h"
-#include "led.h"
+#include "leds.h"
 #include "servo.h"
 #include "gcode.h"
 #include "motors.h"
+#include "fans.h"
 
 static const char *TAG = "MAIN";
 
@@ -32,6 +33,8 @@ void app_main() {
     motor_setup();
 
     servo_setup();
+
+    fans_setup();
 
     initialise_wifi();
     wait_for_ip();

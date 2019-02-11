@@ -10,6 +10,7 @@
 #include "servo.h"
 #include "main.h"
 #include "motors.h"
+#include "fans.h"
 
 #define COMMAD_LENGTH 20
 
@@ -33,6 +34,9 @@ void process_commands() {
                     break;
                 case 'E':
                     e_command(command, (int) command->fields[i].num);
+                    break;
+                case 'F':
+                    f_command(command, (int) command->fields[i].num);
                     break;
                 case 'R':
                     restart();
@@ -97,6 +101,14 @@ void e_command(Command *command, int num) {
     } else {
         motor_power(LOW);
         servo_detach();
+    }
+}
+
+void f_command(Command *command, int num) {
+    if(num == 1) {
+        set_fans(ON);
+    }else if(num == 0){
+        set_fans(OFF);
     }
 }
 
