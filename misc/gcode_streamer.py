@@ -47,18 +47,17 @@ def main(args):
             print(f"Connected to {args.serial_path}, streaming data from {args.gcode_path}:")
 
             s.write(b'E1\n')
-            s.readline()
+            s.readline()   # wait until the command is processed
 
             if args.fans:
                 s.write(b"F1\n")
                 s.readline()
 
             with tqdm.tqdm(total=lines) as pbar:
-                # pbar.set_description(f"Processing")
                 for line in file:
                     stripped_line = line.strip()  # Strip all EOL characters for consistency
                     s.write(stripped_line.encode() + b'\n')  # Send g-code command
-                    s.readline()  # response
+                    s.readline()
                     pbar.update(1)
 
             s.write(b'R\n')  # reset at the end
@@ -83,8 +82,16 @@ def get_arguments():
         parser.print_help()
         exit(1)
 
+    if not args.fans:
+        answer = input("Do you want to turn on the fans? yes/no:\n")
+        if answer.lower() in ["yes", "y", ""]:
+            args.fans = True
+
     return args
 
 
 if __name__ == '__main__':
-    main(get_arguments())
+    try:
+        main(get_arguments())
+    except KeyboardInterrupt:
+        pass
