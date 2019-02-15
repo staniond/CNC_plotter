@@ -102,7 +102,6 @@ void line_high(int x0, int y0, int x1, int y1, uint32_t motorDelay){
     int x = x0;
 
     for (int y=y0; y<y1; y++){
-        //TODO
         gpio_set_level(motor2.step, HIGH);
         if (d > 0){
             gpio_set_level(motor1.step, HIGH);
@@ -129,7 +128,6 @@ void line_low(int x0, int y0, int x1, int y1, uint32_t motorDelay){
     int y = y0;
 
     for(int x = x0; x<x1; x++){
-        //TODO
         gpio_set_level(motor1.step, HIGH);
         if(D > 0){
             gpio_set_level(motor2.step, HIGH);

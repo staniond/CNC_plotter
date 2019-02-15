@@ -22,16 +22,21 @@ extern Motor motor2;
 
 #define MAX_STEPS 4240
 #define MAX_RANGE_MM 40
-#define STEPS_PER_MM (MAX_STEPS/MAX_RANGE_MM)
+#define STEPS_PER_MM ((double)MAX_STEPS/MAX_RANGE_MM)
 
 #define MAX_SPEED 1000 // mm/min
 #define NORMAL_SPEED 750
 
 void motor_setup();
+
 uint32_t feed_to_delay(int);  // mm/min
+
 void motor_power(bool);
+
 void plot_line(double, double, int);
+
 void line_high(int x0, int y0, int x1, int y1, uint32_t motorDelay);
+
 void line_low(int x0, int y0, int x1, int y1, uint32_t motorDelay);
 
 #endif //CNC_PLOTTER_MOTORS_H

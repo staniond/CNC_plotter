@@ -9,15 +9,15 @@
 #include "servo.h"
 #include "utils.h"
 
-#define DEFAULT_uS_LOW 400.0
-#define DEFAULT_uS_HIGH 2400.0
-#define PWM_FREQ 50
+#define DEFAULT_uS_LOW 400
+#define DEFAULT_uS_HIGH 2400
+#define PWM_FREQ 50    //Hz
 #define SERVO_PIN 32
 
 #define MAX_RESOLUTION (1<<13)   // 13 bit timer
 #define PERIOD_uS (1000000.0/PWM_FREQ)
-#define MIN_DUTY_CYCLE ((DEFAULT_uS_LOW / PERIOD_uS) * MAX_RESOLUTION)
-#define MAX_DUTY_CYCLE ((DEFAULT_uS_HIGH / PERIOD_uS) * MAX_RESOLUTION)
+#define MIN_DUTY_CYCLE (((double)DEFAULT_uS_LOW / PERIOD_uS) * MAX_RESOLUTION)
+#define MAX_DUTY_CYCLE (((double)DEFAULT_uS_HIGH / PERIOD_uS) * MAX_RESOLUTION)
 
 #define SERVO_DOWN_PERCENT 80
 #define SERVO_UP_PERCENT 30
@@ -25,6 +25,7 @@
 static uint32_t get_duty_cycle(int);
 static const TickType_t servo_delay = 500 / portTICK_PERIOD_MS; // 500ms delay
 static const char *TAG = "SERVO";
+static int servo_pos;
 
 int servo_paper_pos = SERVO_DOWN;
 
@@ -33,10 +34,14 @@ void servo_setup() {
 }
 
 void move_servo(int percent) {
-    // TODO return if position would not change
+    percent = constrain(percent, 0, 100);
+    if(percent == servo_pos){
+        return;
+    }
 
     uint32_t duty_cycle = get_duty_cycle(percent);
     ESP_LOGI(TAG, "Moving servo to %d%%", percent);
+    servo_pos = percent;
 
     ledc_set_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0, duty_cycle);
     ledc_update_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0);
@@ -64,6 +69,7 @@ void servo_attach() {
     };
 
     ledc_channel_config(&ledc_channel);
+    servo_pos = SERVO_UP;
 }
 
 void servo_detach() {
@@ -75,5 +81,5 @@ void servo_detach() {
 static uint32_t get_duty_cycle(int percent) {
     percent = (int) constrain(percent, 0, 100);
     percent = map(percent, 0, 100, SERVO_DOWN_PERCENT, SERVO_UP_PERCENT);
-    return (uint32_t) (((MAX_DUTY_CYCLE - MIN_DUTY_CYCLE) / (100)) * percent + MIN_DUTY_CYCLE);
+    return (uint32_t) map_double(percent, 0, 100, MIN_DUTY_CYCLE, MAX_DUTY_CYCLE);
 }
