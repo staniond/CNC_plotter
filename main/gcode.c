@@ -18,7 +18,7 @@
 static const char *TAG = "GCODE";
 
 
-void process_commands() {
+void process_commands(void) {
     for(;;){
         Command *command;
         xQueueReceive(queue, &command, portMAX_DELAY);
@@ -163,7 +163,7 @@ Command* parse_buffer(const char* buffer, int bufferLength) {
     return command;
 }
 
-Command* generate_R_command() {
+Command* generate_R_command(void) {
     Command *command = (Command*) malloc(sizeof(Command));
     command->fields = (Field*) malloc(sizeof(Field) * 1);
     command->size = 1;

@@ -20,7 +20,7 @@ int yPos = 0;
 
 static const char *TAG = "MOTORS";
 
-void motor_setup(){
+void motor_setup(void){
     motor1.enabled = 27;
     motor1.step = 14;
     motor1.dir = 12;

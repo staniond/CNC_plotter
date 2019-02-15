@@ -22,7 +22,7 @@ static const char *TAG = "MAIN";
 
 QueueHandle_t queue;
 
-void app_main() {
+void app_main(void) {
     ESP_ERROR_CHECK(nvs_flash_init());
 
     led_setup();
@@ -44,7 +44,7 @@ void app_main() {
     xTaskCreate(process_commands, "process_commands_task", 4096, NULL, PROCESS_COMMANDS_TASK_PRIORITY, NULL);
 }
 
-void restart() {
+void restart(void) {
     move_servo(SERVO_UP);
     plot_line(0, 0, MAX_SPEED);
     motor_power(LOW);

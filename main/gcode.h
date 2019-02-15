@@ -16,12 +16,12 @@ typedef struct Command {
 } Command;
 
 Command* parse_buffer(const char*, int);
-void process_commands();
+void process_commands(void);
 void g_command(Command*, int);
 void s_command(Command*, int);
 void e_command(Command*, int);
 void f_command(Command*, int);
 void print_command(Command *);
-Command* generate_R_command();
+Command* generate_R_command(void);
 
 #endif //CNC_PLOTTER_GCODE_H

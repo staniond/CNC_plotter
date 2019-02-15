@@ -14,7 +14,7 @@
 #define PWM_FREQ 50    //Hz
 #define SERVO_PIN 32
 
-#define MAX_RESOLUTION (1<<13)   // 13 bit timer
+#define MAX_RESOLUTION (1ULL<<13)   // 13 bit timer
 #define PERIOD_uS (1000000.0/PWM_FREQ)
 #define MIN_DUTY_CYCLE (((double)DEFAULT_uS_LOW / PERIOD_uS) * MAX_RESOLUTION)
 #define MAX_DUTY_CYCLE (((double)DEFAULT_uS_HIGH / PERIOD_uS) * MAX_RESOLUTION)
@@ -29,7 +29,7 @@ static int servo_pos;
 
 int servo_paper_pos = SERVO_DOWN;
 
-void servo_setup() {
+void servo_setup(void) {
     servo_attach();
 }
 
@@ -49,7 +49,7 @@ void move_servo(int percent) {
     vTaskDelay(servo_delay);
 }
 
-void servo_attach() {
+void servo_attach(void) {
     ESP_LOGI(TAG, "Attaching servo");
     ledc_timer_config_t ledc_timer = {
             .duty_resolution = LEDC_TIMER_13_BIT, // resolution of PWM duty
@@ -72,7 +72,7 @@ void servo_attach() {
     servo_pos = SERVO_UP;
 }
 
-void servo_detach() {
+void servo_detach(void) {
     ESP_LOGI(TAG, "Detaching servo");
     ledc_stop(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_0, 0);
 }

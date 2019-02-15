@@ -7,7 +7,7 @@
 
 #define GPIO_OUTPUT_PIN_SEL  ((1ULL<<RED_LED_PIN) | (1ULL<<YELLOW_LED_PIN) | (1ULL<<GREEN_LED_PIN))
 
-void led_setup() {
+void led_setup(void) {
     gpio_config_t io_conf;
 
     io_conf.mode = GPIO_MODE_OUTPUT;

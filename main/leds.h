@@ -15,7 +15,7 @@ enum Led { RED = RED_LED_PIN,
     NONE = 0
 };
 
-void led_setup();
+void led_setup(void);
 void led_light(enum Led);
 
 #endif //CNC_PLOTTER_LED_H

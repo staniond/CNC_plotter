@@ -14,9 +14,9 @@
 extern int servo_paper_pos;
 //TODO preference
 
-void servo_setup();
+void servo_setup(void);
 void move_servo(int);
-void servo_attach();
-void servo_detach();
+void servo_attach(void);
+void servo_detach(void);
 
 #endif //CNC_PLOTTER_SERVO_H

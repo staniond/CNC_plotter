@@ -13,7 +13,7 @@
 
 extern QueueHandle_t queue;
 
-void app_main();
-void restart();
+void app_main(void);
+void restart(void);
 
 #endif //CNC_PLOTTER_MAIN_H

@@ -27,7 +27,7 @@ extern Motor motor2;
 #define MAX_SPEED 1000 // mm/min
 #define NORMAL_SPEED 750
 
-void motor_setup();
+void motor_setup(void);
 
 uint32_t feed_to_delay(int);  // mm/min
 
