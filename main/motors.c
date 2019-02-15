@@ -66,7 +66,7 @@ void plot_line(double xPosMM, double yPosMM, int feed) {
         gpio_set_level(motor2.dir, LOW);
     }
 
-    vTaskSuspendAll();
+    vTaskSuspendAll();  // TODO try suspending interrupts also?
     if (abs(newY - yPos) < abs(newX - xPos)){
         if (xPos > newX){
             line_low(newX, newY, xPos, yPos, motorDelay);
