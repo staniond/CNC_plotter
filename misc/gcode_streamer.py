@@ -31,57 +31,60 @@ THE SOFTWARE.
 
 import serial
 import time
-import sys
 import os
 import tqdm
+import argparse
 
 
-def main():
-    serial_path = './ttyUSB0'
-
-    if not os.path.isfile(sys.argv[1]):
-        print("ERROR: Given gcode file does not exist")
-        exit(2)
-    if len(sys.argv) == 3:
-        if not os.path.isfile(sys.argv[2]):
-            print("ERROR: Given serial device does not exist")
-            exit(2)
-        else:
-            serial_path = sys.argv[2]
-    if len(sys.argv) > 3:
-        print("Arguments - <gcode_path> [serial_device]")
-        exit(1)
-
-    with open(sys.argv[1]) as file:
+def main(args):
+    with open(args.gcode_path) as file:
         lines = len(file.readlines())
 
-    # Open grbl serial port
-    with serial.Serial(serial_path, 115200) as s:
-        with open(sys.argv[1], 'r') as file:  # Open g-code file
-            time.sleep(2)  # Wait for grbl to initialize
+    with serial.Serial(args.serial_path, 115200) as s:
+        with open(args.gcode_path, 'r') as file:  # Open g-code file
+            time.sleep(0.25)
 
-            print(f"Connected to {serial_path}, sending data from {sys.argv[1]}:")
+            print(f"Connected to {args.serial_path}, streaming data from {args.gcode_path}:")
 
             s.write(b'E1\n')
             s.readline()
 
-            # Stream g-code to grbl
+            if args.fans:
+                s.write(b"F1\n")
+                s.readline()
+
             with tqdm.tqdm(total=lines) as pbar:
+                # pbar.set_description(f"Processing")
                 for line in file:
                     stripped_line = line.strip()  # Strip all EOL characters for consistency
-                    s.write(stripped_line.encode() + b'\n')  # Send g-code block to grbl
-                    s.readline()  # Wait for grbl response with carriage return
-                    pbar.set_description(f"Processing")
+                    s.write(stripped_line.encode() + b'\n')  # Send g-code command
+                    s.readline()  # response
                     pbar.update(1)
 
-            s.write(b'E0\n')
-            s.readline()
-            s.write(b'R\n')
+            s.write(b'R\n')  # reset at the end
             s.readline()
 
-    # Wait here until grbl is finished to close serial port and file.
-    input(" Press <Enter> to exit and disable grbl.")
+    print("Gcode streaming has finished")
+
+
+def get_arguments():
+    parser = argparse.ArgumentParser("gcode_streamer.py", description="Streams gcode files to serial device")
+
+    parser.add_argument("gcode_path", help="Path to gcode file")
+    parser.add_argument("-s", "--serial-path", help="Path to serial device", default="./ttyUSB0")
+    parser.add_argument("-f", "--fans", action="store_true", help="If you want to turn on fans during the streaming")
+
+    args = parser.parse_args()
+
+    if not os.path.isfile(args.gcode_path) or not os.path.exists(args.serial_path):
+        print("Provide a valid path to gcode file and to serial device")
+        print()
+
+        parser.print_help()
+        exit(1)
+
+    return args
 
 
 if __name__ == '__main__':
-    main()
+    main(get_arguments())
