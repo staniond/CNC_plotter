@@ -23,9 +23,9 @@
 #include "leds.h"
 #include "gcode.h"
 
-#define WIFI_SSID "UPC3618829"
-#define WIFI_PASS "chodnik23"
-#define TCP_PORT 8888
+#define WIFI_SSID CONFIG_WIFI_SSID  //from menuconfig
+#define WIFI_PASS CONFIG_WIFI_PASS
+#define TCP_PORT CONFIG_TCP_PORT
 
 #define BUFFER_SIZE 128
 #define LINE_SIZE 256
@@ -78,6 +78,14 @@ static esp_err_t event_handler(void *ctx, system_event_t *event) {
 }
 
 void initialise_wifi(void) {
+    if(TCP_PORT < 0 || TCP_PORT > UINT16_MAX) {
+        led_light(RED);
+        for(;;) {
+            ESP_LOGI(TAG, "TCP_PORT not in range: %d", TCP_PORT);
+            vTaskDelay(10000 / portTICK_PERIOD_MS);
+        }
+    }
+
     tcpip_adapter_init();
     wifi_event_group = xEventGroupCreate();
     ESP_ERROR_CHECK(esp_event_loop_init(event_handler, NULL));

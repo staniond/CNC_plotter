@@ -26,7 +26,7 @@ void app_main(void) {
     ESP_ERROR_CHECK(nvs_flash_init());
 
     led_setup();
-    led_light(RED);
+    led_light(YELLOW);
 
     queue = xQueueCreate(QUEUE_SIZE, sizeof(Command*));
 
