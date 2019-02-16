@@ -98,7 +98,7 @@ void initialise_wifi(void) {
                     .password = WIFI_PASS,
             },
     };
-    ESP_LOGI(TAG, "Setting WiFi configuration SSID %s...", wifi_config.sta.ssid);
+    ESP_LOGI(TAG, "Setting WiFi configuration SSID: \"%s\"", wifi_config.sta.ssid);
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
     ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
     ESP_ERROR_CHECK(esp_wifi_start());
@@ -212,7 +212,7 @@ static void client_loop(int sock) {
                 if (rx_buffer[i] == '\n') {
                     line_buffer[line_len++] = '\0';
 
-                    Command *command = parse_buffer(line_buffer, line_len);
+                    Command command = parse_buffer(line_buffer, line_len);
                     xQueueSend(queue, &command, portMAX_DELAY);
 
                     int err;

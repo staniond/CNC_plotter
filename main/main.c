@@ -28,7 +28,7 @@ void app_main(void) {
     led_setup();
     led_light(YELLOW);
 
-    queue = xQueueCreate(QUEUE_SIZE, sizeof(Command*));
+    queue = xQueueCreate(QUEUE_SIZE, sizeof(Command));
 
     motor_setup();
 
