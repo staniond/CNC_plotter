@@ -15,13 +15,13 @@ typedef struct Command {
     Field *fields;
 } Command;
 
-Command* parse_buffer(const char*, int);
-void process_commands(void);
-void g_command(Command*, int);
-void s_command(Command*, int);
-void e_command(Command*, int);
-void f_command(Command*, int);
-void print_command(Command *);
+Command* parse_buffer(const char *buffer, int buffer_length);
+void process_commands(void *pvParameters);
+void g_command(Command *command, int num);
+void s_command(Command *command, int num);
+void e_command(Command *command, int num);
+void f_command(Command *command, int num);
+void print_command(Command *command);
 Command* generate_R_command(void);
 
 #endif //CNC_PLOTTER_GCODE_H

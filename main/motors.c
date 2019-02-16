@@ -15,8 +15,10 @@
 Motor motor1;
 Motor motor2;
 
-int xPos = 0;
-int yPos = 0;
+static int xPos = 0;
+static int yPos = 0;
+
+bool motors_enabled;
 
 static const char *TAG = "MOTORS";
 
@@ -44,15 +46,17 @@ void motor_setup(void){
 
     gpio_set_level(motor1.enabled, HIGH);   //turn off power to motors by default
     gpio_set_level(motor2.enabled, HIGH);
+
+    motors_enabled = 0;
 }
 
-void plot_line(double xPosMM, double yPosMM, int feed) {
+void plot_line(double x_pos_mm, double y_pos_mm, int feed) {
 
-    xPosMM = constrain_double(xPosMM, 0, MAX_RANGE_MM);
-    yPosMM = constrain_double(yPosMM, 0, MAX_RANGE_MM);
+    x_pos_mm = constrain_double(x_pos_mm, 0, MAX_RANGE_MM);
+    y_pos_mm = constrain_double(y_pos_mm, 0, MAX_RANGE_MM);
 
-    int newX = (int) (STEPS_PER_MM * xPosMM);
-    int newY = (int) (STEPS_PER_MM * yPosMM);
+    int newX = (int) (STEPS_PER_MM * x_pos_mm);
+    int newY = (int) (STEPS_PER_MM * y_pos_mm);
     uint32_t motorDelay = feed_to_delay(feed);
 
     if(xPos>newX){
@@ -147,6 +151,7 @@ void motor_power(bool on){
     led_light(on?YELLOW:GREEN);
     gpio_set_level(motor1.enabled, (uint32_t) !on); //ENABLE pin needs to be low to turn off power
     gpio_set_level(motor2.enabled, (uint32_t) !on);
+    motors_enabled = on;
     ets_delay_us(5);
     ESP_LOGI(TAG, "Motor power switched %s", on?"ON":"OFF");
 }

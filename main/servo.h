@@ -15,7 +15,7 @@ extern int servo_paper_pos;
 //TODO preference
 
 void servo_setup(void);
-void move_servo(int);
+void move_servo(int percent);
 void servo_attach(void);
 void servo_detach(void);
 

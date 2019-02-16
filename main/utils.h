@@ -7,7 +7,7 @@
 
 long map(long x, long in_min, long in_max, long out_min, long out_max);
 double map_double(double x, double in_min, double in_max, double out_min, double out_max);
-long constrain(long, long, long);
-double constrain_double(double, double, double);
+long constrain(long val, long min, long max);
+double constrain_double(double val, double min, double max);
 
 #endif //CNC_PLOTTER_UTILS_H

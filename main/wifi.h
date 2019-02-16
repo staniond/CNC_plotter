@@ -9,7 +9,7 @@ void initialise_wifi(void);
 
 void wait_for_ip(void);
 
-void tcp_server_task(void *);
+void tcp_server_task(void *pvParameters);
 
 
 #endif //CNC_PLOTTER_WIFI_H

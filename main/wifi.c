@@ -193,12 +193,12 @@ static void client_loop(int sock) {
             ESP_LOGE(TAG, "recv failed: errno %d", errno);
             break;
         }
-            // Connection closed
+        // Connection closed
         else if (len == 0) {
             ESP_LOGI(TAG, "Connection closed");
             break;
         }
-            // Data received
+        // Data received
         else {
             for (int i = 0; i < len; i++) {
                 if (rx_buffer[i] == '\n') {

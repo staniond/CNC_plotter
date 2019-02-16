@@ -11,6 +11,6 @@ enum FanState {
 };
 
 void fans_setup(void);
-void set_fans(enum FanState);
+void set_fans(enum FanState state);
 
 #endif //CNC_PLOTTER_FANS_H

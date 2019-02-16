@@ -18,7 +18,7 @@
 static const char *TAG = "GCODE";
 
 
-void process_commands(void) {
+void process_commands(void *pvParameters) {
     for(;;){
         Command *command;
         xQueueReceive(queue, &command, portMAX_DELAY);
@@ -112,22 +112,22 @@ void f_command(Command *command, int num) {
     }
 }
 
-Command* parse_buffer(const char* buffer, int bufferLength) {
+Command* parse_buffer(const char* buffer, int buffer_length) {
     int size = 0;
     Command *command = (Command*) malloc(sizeof(Command));
     command->fields = (Field*) malloc(sizeof(Field) * COMMAD_LENGTH);
 
-    for (int i = 0; i < bufferLength; i++) {
+    for (int i = 0; i < buffer_length; i++) {
         if (size >= COMMAD_LENGTH) {
             break;
         }
         if (buffer[i] == ';') { //skip ; comment
             break;
         } else if (buffer[i] == '(') { //skip () comment
-            while (++i < bufferLength) {
+            while (++i < buffer_length) {
                 if (buffer[i] == ')') {
                     i++;
-                    if (i >= bufferLength)
+                    if (i >= buffer_length)
                         command->size = size;
                     return command;
                 }
@@ -138,7 +138,7 @@ Command* parse_buffer(const char* buffer, int bufferLength) {
         if (isalpha((int)buffer[i])) {
             command->fields[size].letter = buffer[i];
             command->fields[size].num = atof(&buffer[++i]);
-            while (i < bufferLength) {
+            while (i < buffer_length) {
                 if (isdigit((int)buffer[i]) || buffer[i] == '.' || buffer[i] == ' ' || buffer[i] == '-' || buffer[i] == '+') {
                     i++;
                     continue;

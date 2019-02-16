@@ -17,6 +17,8 @@ typedef struct Motor {
 extern Motor motor1;
 extern Motor motor2;
 
+extern bool motors_enabled;
+
 #define STEPS_PER_REVOLUTION 20
 #define STEP_RESOLUTION 16
 
@@ -29,11 +31,11 @@ extern Motor motor2;
 
 void motor_setup(void);
 
-uint32_t feed_to_delay(int);  // mm/min
+uint32_t feed_to_delay(int feed);  // mm/min
 
-void motor_power(bool);
+void motor_power(bool on);
 
-void plot_line(double, double, int);
+void plot_line(double x_pos_mm, double y_pos_mm, int feed);
 
 void line_high(int x0, int y0, int x1, int y1, uint32_t motorDelay);
 
