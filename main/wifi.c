@@ -35,8 +35,8 @@
 /* FreeRTOS event group to signal when we are connected & ready to make a request */
 static EventGroupHandle_t wifi_event_group;
 
-const int IPV4_GOTIP_BIT = BIT0;
-const int IPV6_GOTIP_BIT = BIT1;
+const int IPV4_GOT_IP_BIT = BIT0;
+const int IPV6_GOT_IP_BIT = BIT1;
 
 static const char *TAG = "WIFI";
 
@@ -53,7 +53,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event) {
             tcpip_adapter_create_ip6_linklocal(TCPIP_ADAPTER_IF_STA);
             break;
         case SYSTEM_EVENT_STA_GOT_IP:
-            xEventGroupSetBits(wifi_event_group, IPV4_GOTIP_BIT);
+            xEventGroupSetBits(wifi_event_group, IPV4_GOT_IP_BIT);
             ESP_LOGI(TAG, "SYSTEM_EVENT_STA_GOT_IP");
 
             char *ip4 = ip4addr_ntoa(&event->event_info.got_ip.ip_info.ip);
@@ -62,11 +62,11 @@ static esp_err_t event_handler(void *ctx, system_event_t *event) {
         case SYSTEM_EVENT_STA_DISCONNECTED:
             /* This is a workaround as ESP32 WiFi libs don't currently auto-reassociate. */
             esp_wifi_connect();
-            xEventGroupClearBits(wifi_event_group, IPV4_GOTIP_BIT);
-            xEventGroupClearBits(wifi_event_group, IPV6_GOTIP_BIT);
+            xEventGroupClearBits(wifi_event_group, IPV4_GOT_IP_BIT);
+            xEventGroupClearBits(wifi_event_group, IPV6_GOT_IP_BIT);
             break;
         case SYSTEM_EVENT_AP_STA_GOT_IP6:
-            xEventGroupSetBits(wifi_event_group, IPV6_GOTIP_BIT);
+            xEventGroupSetBits(wifi_event_group, IPV6_GOT_IP_BIT);
             ESP_LOGI(TAG, "SYSTEM_EVENT_STA_GOT_IP6");
 
             char *ip6 = ip6addr_ntoa(&event->event_info.got_ip6.ip6_info.ip);
@@ -98,7 +98,7 @@ void initialise_wifi(void) {
 }
 
 void wait_for_ip(void) {
-    uint32_t connected_bits = IPV4_GOTIP_BIT | IPV6_GOTIP_BIT;
+    uint32_t connected_bits = IPV4_GOT_IP_BIT | IPV6_GOT_IP_BIT;
 
     ESP_LOGI(TAG, "Waiting for AP connection...");
     EventBits_t event_bits;
