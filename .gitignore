@@ -1,7 +1,7 @@
 misc/ttyUSB0
 *.swp
 build/
-cmake-build-debug
-.idea
+cmake-build-debug/
+.idea/
 sdkconfig
 sdkconfig.old
