@@ -42,27 +42,31 @@ def main(args):
 
     with serial.Serial(args.serial_path, 115200) as s:
         with open(args.gcode_path, 'r') as file:  # Open g-code file
-            time.sleep(0.25)
+            
+            try:
+                time.sleep(0.25)
+                print(f"Connected to {args.serial_path}, streaming data from {args.gcode_path}:")
 
-            print(f"Connected to {args.serial_path}, streaming data from {args.gcode_path}:")
+                s.write(b'E1\n')
+                s.readline()   # wait until the command is processed
 
-            s.write(b'E1\n')
-            s.readline()   # wait until the command is processed
-
-            if args.fans:
-                s.write(b"F1\n")
-                s.readline()
-
-            with tqdm.tqdm(total=lines) as pbar:
-                for line in file:
-                    stripped_line = line.strip()  # Strip all EOL characters for consistency
-                    s.write(stripped_line.encode() + b'\n')  # Send g-code command
+                if args.fans:
+                    s.write(b"F1\n")
                     s.readline()
-                    pbar.update(1)
 
-            s.write(b'R\n')  # reset at the end
-            s.readline()
+                with tqdm.tqdm(total=lines) as pbar:
+                    for line in file:
+                        stripped_line = line.strip()  # Strip all EOL characters for consistency
+                        s.write(stripped_line.encode() + b'\n')  # Send g-code command
+                        s.readline()
+                        pbar.update(1)
 
+                s.write(b'R\n')  # reset at the end
+                s.readline()
+            except KeyboardInterrupt:
+                s.write(b'R\n')
+                s.readline()
+            
     print("Gcode streaming has finished")
 
 
