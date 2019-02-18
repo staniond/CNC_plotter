@@ -29,44 +29,49 @@ THE SOFTWARE.
 ---------------------
 """
 
-import serial
+import socket
 import time
 import os
 import tqdm
 import argparse
+
+buffer_size = 128
 
 
 def main(args):
     with open(args.gcode_path) as file:
         lines = len(file.readlines())
 
-    with serial.Serial(args.serial_path, 115200) as s:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((args.ip_address, args.port))
         with open(args.gcode_path, 'r') as file:  # Open g-code file
-            
+    
             try:
                 time.sleep(0.25)
-                print(f"Connected to {args.serial_path}, streaming data from {args.gcode_path}:")
-
-                s.write(b'E1\n')
-                s.readline()   # wait until the command is processed
-
+                print(f"Connected to {args.ip_address}:{args.port}, streaming data from {args.gcode_path}:")
+    
+                s.sendall(b'E1\n')
+                s.recv(buffer_size)  # wait until the command is processed
+    
                 if args.fans:
-                    s.write(b"F1\n")
-                    s.readline()
-
+                    s.sendall(b"F1\n")
+                    s.recv(buffer_size)
+    
                 with tqdm.tqdm(total=lines) as pbar:
                     for line in file:
                         stripped_line = line.strip()  # Strip all EOL characters for consistency
-                        s.write(stripped_line.encode() + b'\n')  # Send g-code command
-                        s.readline()
-                        pbar.update(1)
+                        s.sendall(stripped_line.encode() + b'\n')  # Send g-code command
 
-                s.write(b'R\n')  # reset at the end
-                s.readline()
+                        answer = s.recv(buffer_size)
+                        pbar.set_description(answer.decode().strip())
+                        pbar.update(1)
+    
+                s.sendall(b'R\n')  # reset at the end
+                s.recv(buffer_size)
             except KeyboardInterrupt:
-                s.write(b'R\n')
-                s.readline()
-            
+                s.sendall(b'R\n')
+                s.recv(buffer_size)
+
     print("Gcode streaming has finished")
 
 
@@ -74,13 +79,14 @@ def get_arguments():
     parser = argparse.ArgumentParser("gcode_streamer.py", description="Streams gcode files to serial device")
 
     parser.add_argument("gcode_path", help="Path to gcode file")
-    parser.add_argument("-s", "--serial-path", help="Path to serial device", default="./ttyUSB0")
+    parser.add_argument("ip_address", help="IP address to connect to")
+    parser.add_argument("port", help="Port to connect to", type=int)
     parser.add_argument("-f", "--fans", action="store_true", help="If you want to turn on fans during the streaming")
 
     args = parser.parse_args()
 
-    if not os.path.isfile(args.gcode_path) or not os.path.exists(args.serial_path):
-        print("Provide a valid path to gcode file and to serial device")
+    if not os.path.isfile(args.gcode_path):
+        print("Provide a valid path to a gcode file")
         print()
 
         parser.print_help()

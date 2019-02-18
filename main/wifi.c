@@ -78,9 +78,9 @@ static esp_err_t event_handler(void *ctx, system_event_t *event) {
 }
 
 void initialise_wifi(void) {
-    if(TCP_PORT < 0 || TCP_PORT > UINT16_MAX) {
+    if (TCP_PORT < 0 || TCP_PORT > UINT16_MAX) {
         led_light(RED);
-        for(;;) {
+        for (;;) {
             ESP_LOGI(TAG, "TCP_PORT not in range: %d", TCP_PORT);
             vTaskDelay(10000 / portTICK_PERIOD_MS);
         }
@@ -201,12 +201,12 @@ static void client_loop(int sock) {
             ESP_LOGE(TAG, "recv failed: errno %d", errno);
             break;
         }
-        // Connection closed
+            // Connection closed
         else if (len == 0) {
             ESP_LOGI(TAG, "Connection closed");
             break;
         }
-        // Data received
+            // Data received
         else {
             for (int i = 0; i < len; i++) {
                 if (rx_buffer[i] == '\n') {
@@ -215,8 +215,12 @@ static void client_loop(int sock) {
                     Command command = parse_buffer(line_buffer, line_len);
                     xQueueSend(queue, &command, portMAX_DELAY);
 
+                    char answer[8];
+                    size_t answer_length = (size_t) snprintf(answer, sizeof(answer) / sizeof(answer[0]), "OK (%u)\n",
+                                                 QUEUE_SIZE - uxQueueSpacesAvailable(queue));
+
                     int err;
-                        err = send(sock, "OK\n", 4, 0);
+                    err = send(sock, answer, answer_length, 0);
                     if (err < 0) {
                         ESP_LOGE(TAG, "Error occured during sending: errno %d", errno);
                         break;
