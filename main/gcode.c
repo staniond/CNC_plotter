@@ -22,7 +22,7 @@ void process_commands(void *pvParameters) {
     for(;;){
         Command command;
         xQueueReceive(queue, &command, portMAX_DELAY);
-        print_command(command);
+//        print_command(command);
 
         for (int i = 0; i < command.size; i++) {
             switch (command.fields[i].letter) {
@@ -173,6 +173,7 @@ Command generate_R_command(void) {
 }
 
 void print_command(Command command) {
+    // TODO only if log level info
     for (int i = 0; i < command.size; i++) {
         printf("%c%.4lf ", command.fields[i].letter, command.fields[i].num);
     }

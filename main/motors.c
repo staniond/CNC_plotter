@@ -51,6 +51,7 @@ void motor_setup(void){
 }
 
 void plot_line(double x_pos_mm, double y_pos_mm, int feed) {
+    vTaskSuspendAll();  // TODO try suspending interrupts also?
 
     x_pos_mm = constrain_double(x_pos_mm, 0, MAX_RANGE_MM);
     y_pos_mm = constrain_double(y_pos_mm, 0, MAX_RANGE_MM);
@@ -70,7 +71,6 @@ void plot_line(double x_pos_mm, double y_pos_mm, int feed) {
         gpio_set_level(motor2.dir, LOW);
     }
 
-    vTaskSuspendAll();  // TODO try suspending interrupts also?
     if (abs(newY - yPos) < abs(newX - xPos)){
         if (xPos > newX){
             line_low(newX, newY, xPos, yPos, motorDelay);
