@@ -14,8 +14,8 @@ typedef struct Motor {
     int enabled;
 } Motor;
 
-extern Motor motor1;
-extern Motor motor2;
+extern Motor motor_x;
+extern Motor motor_y;
 
 extern bool motors_enabled;
 

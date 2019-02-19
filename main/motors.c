@@ -12,40 +12,40 @@
 #include "leds.h"
 
 
-Motor motor1;
-Motor motor2;
+Motor motor_x;
+Motor motor_y;
 
-static int xPos = 0;
-static int yPos = 0;
+static int x_pos = 0;
+static int y_pos = 0;
 
 bool motors_enabled;
 
 static const char *TAG = "MOTORS";
 
 void motor_setup(void){
-    motor1.enabled = 27;
-    motor1.step = 14;
-    motor1.dir = 12;
+    motor_x.enabled = 27;
+    motor_x.step = 14;
+    motor_x.dir = 12;
 
-    motor2.enabled = 33;
-    motor2.step = 25;
-    motor2.dir = 26;
+    motor_y.enabled = 33;
+    motor_y.step = 25;
+    motor_y.dir = 26;
 
     gpio_config_t io_conf;
 
-    uint64_t motor1_pins = ((1ULL<<motor1.enabled) | (1ULL<<motor1.step) | (1ULL<<motor1.dir));
-    uint64_t motor2_pins = ((1ULL<<motor2.enabled) | (1ULL<<motor2.step) | (1ULL<<motor2.dir));
+    uint64_t motor_x_pins = ((1ULL<<motor_x.enabled) | (1ULL<<motor_x.step) | (1ULL<<motor_x.dir));
+    uint64_t motor_y_pins = ((1ULL<<motor_y.enabled) | (1ULL<<motor_y.step) | (1ULL<<motor_y.dir));
 
     io_conf.mode = GPIO_MODE_OUTPUT;
-    io_conf.pin_bit_mask = (motor1_pins | motor2_pins);
+    io_conf.pin_bit_mask = (motor_x_pins | motor_y_pins);
     io_conf.intr_type = 0;
     io_conf.pull_down_en = 0;
     io_conf.pull_up_en = 0;
 
     gpio_config(&io_conf);
 
-    gpio_set_level(motor1.enabled, HIGH);   //turn off power to motors by default
-    gpio_set_level(motor2.enabled, HIGH);
+    gpio_set_level(motor_x.enabled, HIGH);   //turn off power to motors by default
+    gpio_set_level(motor_y.enabled, HIGH);
 
     motors_enabled = 0;
 }
@@ -56,42 +56,42 @@ void plot_line(double x_pos_mm, double y_pos_mm, int feed) {
     x_pos_mm = constrain_double(x_pos_mm, 0, MAX_RANGE_MM);
     y_pos_mm = constrain_double(y_pos_mm, 0, MAX_RANGE_MM);
 
-    int newX = (int) (STEPS_PER_MM * x_pos_mm);
-    int newY = (int) (STEPS_PER_MM * y_pos_mm);
+    int new_x_pos = (int) (STEPS_PER_MM * x_pos_mm);
+    int new_y_pos = (int) (STEPS_PER_MM * y_pos_mm);
     uint32_t motorDelay = feed_to_delay(feed);
 
-    if(xPos>newX){
-        gpio_set_level(motor1.dir, HIGH);
+    if(x_pos>new_x_pos){
+        gpio_set_level(motor_x.dir, HIGH);
     }else{
-        gpio_set_level(motor1.dir, LOW);
+        gpio_set_level(motor_x.dir, LOW);
     }
-    if(yPos>newY){
-        gpio_set_level(motor2.dir, HIGH);
+    if(y_pos>new_y_pos){
+        gpio_set_level(motor_y.dir, HIGH);
     }else{
-        gpio_set_level(motor2.dir, LOW);
+        gpio_set_level(motor_y.dir, LOW);
     }
 
-    if (abs(newY - yPos) < abs(newX - xPos)){
-        if (xPos > newX){
-            line_low(newX, newY, xPos, yPos, motorDelay);
+    if (abs(new_y_pos - y_pos) < abs(new_x_pos - x_pos)){
+        if (x_pos > new_x_pos){
+            line_low(new_x_pos, new_y_pos, x_pos, y_pos, motorDelay);
         }
         else{
-            line_low(xPos, yPos, newX, newY, motorDelay);
+            line_low(x_pos, y_pos, new_x_pos, new_y_pos, motorDelay);
         }
     }
     else{
-        if (yPos > newY){;
-            line_high(newX, newY, xPos, yPos, motorDelay);
+        if (y_pos > new_y_pos){;
+            line_high(new_x_pos, new_y_pos, x_pos, y_pos, motorDelay);
         }
         else{
-            line_high(xPos, yPos, newX, newY, motorDelay);
+            line_high(x_pos, y_pos, new_x_pos, new_y_pos, motorDelay);
         }
     }
     xTaskResumeAll();
 
-    xPos = newX;
-    yPos = newY;
-    ESP_LOGI(TAG, "New pos - %d, %d", xPos, yPos);
+    x_pos = new_x_pos;
+    y_pos = new_y_pos;
+    ESP_LOGI(TAG, "New pos - %d, %d", x_pos, y_pos);
 }
 
 void line_high(int x0, int y0, int x1, int y1, uint32_t motorDelay){
@@ -106,15 +106,15 @@ void line_high(int x0, int y0, int x1, int y1, uint32_t motorDelay){
     int x = x0;
 
     for (int y=y0; y<y1; y++){
-        gpio_set_level(motor2.step, HIGH);
+        gpio_set_level(motor_y.step, HIGH);
         if (d > 0){
-            gpio_set_level(motor1.step, HIGH);
+            gpio_set_level(motor_x.step, HIGH);
             x = x + xi;
             d = d - 2 * dy;
         }
         ets_delay_us(5);
-        gpio_set_level(motor1.step, LOW);
-        gpio_set_level(motor2.step, LOW);
+        gpio_set_level(motor_x.step, LOW);
+        gpio_set_level(motor_y.step, LOW);
         ets_delay_us(motorDelay - 5);
         d = d + 2 * dx;
     }
@@ -132,15 +132,15 @@ void line_low(int x0, int y0, int x1, int y1, uint32_t motorDelay){
     int y = y0;
 
     for(int x = x0; x<x1; x++){
-        gpio_set_level(motor1.step, HIGH);
+        gpio_set_level(motor_x.step, HIGH);
         if(D > 0){
-            gpio_set_level(motor2.step, HIGH);
+            gpio_set_level(motor_y.step, HIGH);
             y = y + yi;
             D = D - 2*dx;
         }
         ets_delay_us(5);
-        gpio_set_level(motor1.step, LOW);
-        gpio_set_level(motor2.step, LOW);
+        gpio_set_level(motor_x.step, LOW);
+        gpio_set_level(motor_y.step, LOW);
         ets_delay_us(motorDelay - 5);
         D = D + 2*dy;
     }
@@ -149,8 +149,8 @@ void line_low(int x0, int y0, int x1, int y1, uint32_t motorDelay){
 
 void motor_power(bool on){
     led_light(on?YELLOW:GREEN);
-    gpio_set_level(motor1.enabled, (uint32_t) !on); //ENABLE pin needs to be low to turn off power
-    gpio_set_level(motor2.enabled, (uint32_t) !on);
+    gpio_set_level(motor_x.enabled, (uint32_t) !on); //ENABLE pin needs to be low to turn off power
+    gpio_set_level(motor_y.enabled, (uint32_t) !on);
     motors_enabled = on;
     ets_delay_us(5);
     ESP_LOGI(TAG, "Motor power switched %s", on?"ON":"OFF");
