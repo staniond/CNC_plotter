@@ -6,7 +6,7 @@
 #include <esp_log.h>
 #include "fans.h"
 
-#define FANS_PIN 17
+#define FANS_PIN 0
 #define GPIO_OUTPUT_PIN_SEL  (1ULL<<FANS_PIN)
 
 static const char *TAG = "FANS";

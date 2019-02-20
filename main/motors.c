@@ -23,13 +23,13 @@ bool motors_enabled;
 static const char *TAG = "MOTORS";
 
 void motor_setup(void){
-    motor_x.enabled = 27;
-    motor_x.step = 14;
-    motor_x.dir = 12;
+    motor_x.enabled = 5;
+    motor_x.step = 18;
+    motor_x.dir = 19;
 
-    motor_y.enabled = 33;
-    motor_y.step = 25;
-    motor_y.dir = 26;
+    motor_y.enabled = 23;
+    motor_y.step = 22;
+    motor_y.dir = 21;
 
     gpio_config_t io_conf;
 
