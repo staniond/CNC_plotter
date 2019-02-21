@@ -22,8 +22,10 @@
 #define SERVO_DOWN_PERCENT 80
 #define SERVO_UP_PERCENT 30
 
+#define SERVO_DELAY_MS 400
+
 static uint32_t get_duty_cycle(int);
-static const TickType_t servo_delay = 500 / portTICK_PERIOD_MS; // 500ms delay
+static const TickType_t servo_delay = SERVO_DELAY_MS / portTICK_PERIOD_MS; // 500ms delay
 static const char *TAG = "SERVO";
 static int servo_pos;
 
@@ -31,6 +33,8 @@ int servo_paper_pos = SERVO_DOWN;
 
 void servo_setup(void) {
     servo_attach();
+    vTaskDelay(servo_delay);
+    servo_detach();
 }
 
 void move_servo(int percent) {
