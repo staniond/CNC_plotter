@@ -120,14 +120,14 @@ void line_high(int x0, int y0, int x1, int y1, uint32_t motorDelay) {
         gpio_set_level(motor_y.step, HIGH);
         if (d > 0) {
             gpio_set_level(motor_x.step, HIGH);
-            x = x + xi;
-            d = d - 2 * dy;
+            x += xi;
+            d -= 2 * dy;
         }
         ets_delay_us(5);
         gpio_set_level(motor_x.step, LOW);
         gpio_set_level(motor_y.step, LOW);
         ets_delay_us(motorDelay - 5);
-        d = d + 2 * dx;
+        d += 2 * dx;
     }
 }
 
@@ -146,14 +146,14 @@ void line_low(int x0, int y0, int x1, int y1, uint32_t motorDelay) {
         gpio_set_level(motor_x.step, HIGH);
         if (D > 0) {
             gpio_set_level(motor_y.step, HIGH);
-            y = y + yi;
-            D = D - 2 * dx;
+            y += + yi;
+            D -= 2 * dx;
         }
         ets_delay_us(5);
         gpio_set_level(motor_x.step, LOW);
         gpio_set_level(motor_y.step, LOW);
         ets_delay_us(motorDelay - 5);
-        D = D + 2 * dy;
+        D += 2 * dy;
     }
 }
 
