@@ -5,13 +5,13 @@
 #include <driver/gpio.h>
 #include "leds.h"
 
-#define GPIO_OUTPUT_PIN_SEL  ((1ULL<<RED_LED_PIN) | (1ULL<<YELLOW_LED_PIN) | (1ULL<<GREEN_LED_PIN))
-
 void led_setup(void) {
     gpio_config_t io_conf;
 
+    uint64_t led_pins = (1ULL << RED_LED_PIN) | (1ULL << YELLOW_LED_PIN) | (1ULL << GREEN_LED_PIN);
+
     io_conf.mode = GPIO_MODE_OUTPUT;
-    io_conf.pin_bit_mask = GPIO_OUTPUT_PIN_SEL;
+    io_conf.pin_bit_mask = led_pins;
     io_conf.intr_type = 0;
     io_conf.pull_down_en = 0;
     io_conf.pull_up_en = 0;
@@ -24,7 +24,7 @@ void led_light(enum Led led) {
     gpio_set_level(YELLOW_LED_PIN, 0);
     gpio_set_level(GREEN_LED_PIN, 0);
 
-    if(led == NONE) {
+    if (led == NONE) {
         return;
     }
 
