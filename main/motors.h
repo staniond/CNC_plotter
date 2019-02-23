@@ -8,26 +8,10 @@
 #define HIGH 1
 #define LOW 0
 
-typedef struct Motor {
-    int step;
-    int dir;
-    int enabled;
-} Motor;
-
-extern Motor motor_x;
-extern Motor motor_y;
-
-extern bool motors_enabled;
-
-#define STEPS_PER_REVOLUTION 20
-#define STEP_RESOLUTION 16
-
-#define MAX_STEPS 4240
-#define MAX_RANGE_MM 40
-#define STEPS_PER_MM ((double)MAX_STEPS/MAX_RANGE_MM)
-
 #define MAX_SPEED 1000 // mm/min
 #define NORMAL_SPEED 750
+
+extern bool motors_enabled;
 
 void motor_setup(void);
 
