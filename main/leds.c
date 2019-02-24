@@ -5,6 +5,8 @@
 #include <driver/gpio.h>
 #include "leds.h"
 
+// TODO led task to be able to blink easily
+
 void led_setup(void) {
     gpio_config_t io_conf;
 
