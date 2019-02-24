@@ -10,6 +10,7 @@
 #include "motors.h"
 #include "utils.h"
 #include "leds.h"
+#include "acceleration.h"
 
 #define STEPS_PER_REVOLUTION 20
 #define STEP_RESOLUTION 16
@@ -25,6 +26,10 @@ typedef struct Motor {
     int dir;
     int enabled;
 } Motor;
+
+uint32_t feed_to_delay(uint32_t feed);
+
+uint32_t leading_axis_steps(int new_x_pos, int new_y_pos);
 
 Motor motor_x = {
         .enabled = 27,
@@ -64,16 +69,16 @@ void motor_setup(void) {
     motors_enabled = 0;
 }
 
-void plot_line(double x_pos_mm, double y_pos_mm, int feed) {
+void plot_line(double x_pos_mm, double y_pos_mm, uint32_t feed) {
     vTaskSuspendAll();  // TODO try suspending interrupts also?
 
-    x_pos_mm = constrain_double(x_pos_mm, 0, MAX_RANGE_MM);
-    y_pos_mm = constrain_double(y_pos_mm, 0, MAX_RANGE_MM);
+    x_pos_mm = CONSTRAIN(x_pos_mm, 0, MAX_RANGE_MM);
+    y_pos_mm = CONSTRAIN(y_pos_mm, 0, MAX_RANGE_MM);
 
     int new_x_pos = (int) (STEPS_PER_MM * x_pos_mm);
     int new_y_pos = (int) (STEPS_PER_MM * y_pos_mm);
-    uint32_t motorDelay = feed_to_delay(feed);
 
+    //set motor direction
     if (x_pos > new_x_pos) {
         gpio_set_level(motor_x.dir, HIGH);
     } else {
@@ -85,27 +90,31 @@ void plot_line(double x_pos_mm, double y_pos_mm, int feed) {
         gpio_set_level(motor_y.dir, LOW);
     }
 
+    setup_acceleration(leading_axis_steps(new_x_pos, new_y_pos), feed);
+
     if (abs(new_y_pos - y_pos) < abs(new_x_pos - x_pos)) {
         if (x_pos > new_x_pos) {
-            line_low(new_x_pos, new_y_pos, x_pos, y_pos, motorDelay);
+            line_low(new_x_pos, new_y_pos, x_pos, y_pos);
         } else {
-            line_low(x_pos, y_pos, new_x_pos, new_y_pos, motorDelay);
+            line_low(x_pos, y_pos, new_x_pos, new_y_pos);
         }
     } else {
         if (y_pos > new_y_pos) { ;
-            line_high(new_x_pos, new_y_pos, x_pos, y_pos, motorDelay);
+            line_high(new_x_pos, new_y_pos, x_pos, y_pos);
         } else {
-            line_high(x_pos, y_pos, new_x_pos, new_y_pos, motorDelay);
+            line_high(x_pos, y_pos, new_x_pos, new_y_pos);
         }
     }
+
     xTaskResumeAll();
 
     x_pos = new_x_pos;
     y_pos = new_y_pos;
+
     ESP_LOGI(TAG, "New pos - %d, %d", x_pos, y_pos);
 }
 
-void line_high(int x0, int y0, int x1, int y1, uint32_t motorDelay) {
+void line_high(int x0, int y0, int x1, int y1) {
     int dx = x1 - x0;
     int dy = y1 - y0;
     int xi = 1;
@@ -126,12 +135,12 @@ void line_high(int x0, int y0, int x1, int y1, uint32_t motorDelay) {
         ets_delay_us(5);
         gpio_set_level(motor_x.step, LOW);
         gpio_set_level(motor_y.step, LOW);
-        ets_delay_us(motorDelay - 5);
+        ets_delay_us(feed_to_delay(next_feed()) - 5);
         d += 2 * dx;
     }
 }
 
-void line_low(int x0, int y0, int x1, int y1, uint32_t motorDelay) {
+void line_low(int x0, int y0, int x1, int y1) {
     int dx = x1 - x0;
     int dy = y1 - y0;
     int yi = 1;
@@ -146,13 +155,13 @@ void line_low(int x0, int y0, int x1, int y1, uint32_t motorDelay) {
         gpio_set_level(motor_x.step, HIGH);
         if (D > 0) {
             gpio_set_level(motor_y.step, HIGH);
-            y += + yi;
+            y += yi;
             D -= 2 * dx;
         }
         ets_delay_us(5);
         gpio_set_level(motor_x.step, LOW);
         gpio_set_level(motor_y.step, LOW);
-        ets_delay_us(motorDelay - 5);
+        ets_delay_us(feed_to_delay(next_feed()) - 5);
         D += 2 * dy;
     }
 }
@@ -168,12 +177,18 @@ void motor_power(bool on) {
 }
 
 
-uint32_t feed_to_delay(int feed) {
+uint32_t feed_to_delay(uint32_t feed) {
     uint32_t motorDelay;
-    feed = constrain(feed, feed, MAX_SPEED);
+    feed = CONSTRAIN(feed, feed, MAX_FEED);
     if (feed <= 0) {
-        feed = NORMAL_SPEED;
+        feed = NORMAL_FEED;
     }
     motorDelay = (uint32_t) (uS_IN_MINUTE / (feed * STEPS_PER_MM));
     return motorDelay;
+}
+
+uint32_t leading_axis_steps(int new_x_pos, int new_y_pos) {
+    int delta_x = abs(new_x_pos - x_pos);
+    int delta_y = abs(new_y_pos - y_pos);
+    return (uint32_t) MAX(delta_x, delta_y);
 }

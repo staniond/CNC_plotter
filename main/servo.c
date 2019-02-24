@@ -38,7 +38,7 @@ void servo_setup(void) {
 }
 
 void move_servo(int percent) {
-    percent = constrain(percent, 0, 100);
+    percent = CONSTRAIN(percent, 0, 100);
     if(percent == servo_pos){
         return;
     }
@@ -83,7 +83,7 @@ void servo_detach(void) {
 
 
 static uint32_t get_duty_cycle(int percent) {
-    percent = (int) constrain(percent, 0, 100);
+    percent = CONSTRAIN(percent, 0, 100);
     percent = map(percent, 0, 100, SERVO_DOWN_PERCENT, SERVO_UP_PERCENT);
     return (uint32_t) map_double(percent, 0, 100, MIN_DUTY_CYCLE, MAX_DUTY_CYCLE);
 }

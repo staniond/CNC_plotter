@@ -27,6 +27,8 @@ void e_command(Command command, int num);
 
 void f_command(Command command, int num);
 
+void m_command(Command command, int num);
+
 void print_command(Command command);
 
 Command generate_R_command(void);

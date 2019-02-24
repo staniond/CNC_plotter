@@ -11,6 +11,7 @@
 #include "main.h"
 #include "motors.h"
 #include "fans.h"
+#include "acceleration.h"
 
 #define COMMAND_LENGTH 20
 
@@ -38,6 +39,9 @@ void process_commands(void *pvParameters) {
                 case 'F':
                     f_command(command, (int) command.fields[i].num);
                     break;
+                case 'M':
+                    m_command(command, (int) command.fields[i].num);
+                    break;
                 case 'R':
                     restart();
                     break;
@@ -59,11 +63,11 @@ void g_command(Command command, int num) {
         return;
     }
 
-    double feed = NORMAL_SPEED;
+    double feed = NORMAL_FEED;
     if (num == 0) {
-        feed = MAX_SPEED;
+        feed = MAX_FEED;
     } else if (num == 1) {
-        feed = NORMAL_SPEED;
+        feed = NORMAL_FEED;
     }
 
     double newX = 0, newY = 0;
@@ -85,7 +89,7 @@ void g_command(Command command, int num) {
         }
     }
     if (move) {
-        plot_line(newX, newY, (int) feed);
+        plot_line(newX, newY, (uint32_t) feed);
     }
 }
 
@@ -108,6 +112,19 @@ void f_command(Command command, int num) {
         set_fans(ON);
     }else if(num == 0){
         set_fans(OFF);
+    }
+}
+
+void m_command(Command command, int num) {
+    if(num != 1) {
+        return;
+    }
+    for (int i = 0; i < command.size; ++i) {
+        if(command.fields[i].letter == 'A') {
+            change_acceleration((int) command.fields[i].num);
+        }else if(command.fields[i].letter == 'F') {
+            change_min_feed((uint32_t) command.fields[i].num);
+        }
     }
 }
 
