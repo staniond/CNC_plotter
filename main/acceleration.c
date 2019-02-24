@@ -5,11 +5,10 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "acceleration.h"
-#include "motors.h"
 #include "utils.h"
 
 uint32_t min_feed = MIN_FEED;
-int acceleration = 5;
+float acceleration = 5;
 
 struct Profile {
     int steps;
@@ -17,7 +16,7 @@ struct Profile {
     int accel_steps;
     int accel_up;
     int accel_down;
-    uint32_t feed;
+    float feed;
     uint32_t max_feed;
 
 } profile;
@@ -27,7 +26,7 @@ uint32_t next_feed(void) {
         return profile.max_feed;
     }
 
-    uint32_t feed = profile.feed;
+    uint32_t feed = (uint32_t) profile.feed;
     profile.step_num++;
 
     if (profile.step_num <= profile.accel_up) {
@@ -45,7 +44,7 @@ void setup_acceleration(uint32_t steps, uint32_t max_feed) {
     profile.steps = steps;
     profile.step_num = 0;
     if(acceleration > 0){
-        profile.accel_steps = ((profile.max_feed - min_feed) / acceleration) + 1;
+        profile.accel_steps = (int) (((profile.max_feed - min_feed) / acceleration) + 1);
     }else{
         profile.accel_steps = 0;
     }
@@ -60,7 +59,7 @@ void setup_acceleration(uint32_t steps, uint32_t max_feed) {
     }
 }
 
-void change_acceleration(int new_acceleration) {
+void change_acceleration(float new_acceleration) {
     acceleration = CONSTRAIN(new_acceleration, MIN_ACCELERATION, MAX_ACCELERATION);
 }
 

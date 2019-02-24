@@ -17,7 +17,7 @@ void setup_acceleration(uint32_t steps, uint32_t max_feed);
 
 uint32_t next_feed(void);
 
-void change_acceleration(int new_acceleration);
+void change_acceleration(float new_acceleration);
 
 void change_min_feed(uint32_t new_min_feed);
 
