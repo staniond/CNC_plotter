@@ -17,19 +17,19 @@
 
 #define uS_IN_MINUTE 60000000
 
-#define MAX_STEPS 4240
-#define MAX_RANGE_MM 40
-#define STEPS_PER_MM ((double)MAX_STEPS/MAX_RANGE_MM)
-
 typedef struct Motor {
     int step;
     int dir;
     int enabled;
 } Motor;
 
-uint32_t feed_to_delay(uint32_t feed);
+uint32_t feed_to_delay(int feed);
 
-uint32_t leading_axis_steps(int new_x_pos, int new_y_pos);
+int leading_axis_steps(int new_x_pos, int new_y_pos);
+
+void line_high(int x0, int y0, int x1, int y1, uint32_t motor_delay);
+
+void line_low(int x0, int y0, int x1, int y1, uint32_t motor_delay);
 
 Motor motor_x = {
         .enabled = 27,
@@ -42,8 +42,8 @@ Motor motor_y = {
         .dir = 26,
 };
 
-static int x_pos = 0;
-static int y_pos = 0;
+int x_pos = 0;
+int y_pos = 0;
 
 bool motors_enabled;
 
@@ -69,14 +69,13 @@ void motor_setup(void) {
     motors_enabled = 0;
 }
 
-void plot_line(double x_pos_mm, double y_pos_mm, uint32_t feed) {
+void plot_line(int new_x_pos, int new_y_pos, int feed) {
     vTaskSuspendAll();  // TODO try suspending interrupts also?
 
-    x_pos_mm = CONSTRAIN(x_pos_mm, 0, MAX_RANGE_MM);
-    y_pos_mm = CONSTRAIN(y_pos_mm, 0, MAX_RANGE_MM);
+    new_x_pos = CONSTRAIN(new_x_pos, 0, MAX_STEPS);
+    new_y_pos = CONSTRAIN(new_y_pos, 0, MAX_STEPS);
 
-    int new_x_pos = (int) (STEPS_PER_MM * x_pos_mm);
-    int new_y_pos = (int) (STEPS_PER_MM * y_pos_mm);
+    uint32_t motor_delay = feed_to_delay(feed);
 
     //set motor direction
     if (x_pos > new_x_pos) {
@@ -90,19 +89,17 @@ void plot_line(double x_pos_mm, double y_pos_mm, uint32_t feed) {
         gpio_set_level(motor_y.dir, LOW);
     }
 
-    setup_acceleration(leading_axis_steps(new_x_pos, new_y_pos), feed);
-
     if (abs(new_y_pos - y_pos) < abs(new_x_pos - x_pos)) {
         if (x_pos > new_x_pos) {
-            line_low(new_x_pos, new_y_pos, x_pos, y_pos);
+            line_low(new_x_pos, new_y_pos, x_pos, y_pos, motor_delay);
         } else {
-            line_low(x_pos, y_pos, new_x_pos, new_y_pos);
+            line_low(x_pos, y_pos, new_x_pos, new_y_pos, motor_delay);
         }
     } else {
         if (y_pos > new_y_pos) { ;
-            line_high(new_x_pos, new_y_pos, x_pos, y_pos);
+            line_high(new_x_pos, new_y_pos, x_pos, y_pos, motor_delay);
         } else {
-            line_high(x_pos, y_pos, new_x_pos, new_y_pos);
+            line_high(x_pos, y_pos, new_x_pos, new_y_pos, motor_delay);
         }
     }
 
@@ -114,7 +111,7 @@ void plot_line(double x_pos_mm, double y_pos_mm, uint32_t feed) {
     ESP_LOGI(TAG, "New pos - %d, %d", x_pos, y_pos);
 }
 
-void line_high(int x0, int y0, int x1, int y1) {
+void line_high(int x0, int y0, int x1, int y1, uint32_t motor_delay) {
     int dx = x1 - x0;
     int dy = y1 - y0;
     int xi = 1;
@@ -135,12 +132,12 @@ void line_high(int x0, int y0, int x1, int y1) {
         ets_delay_us(5);
         gpio_set_level(motor_x.step, LOW);
         gpio_set_level(motor_y.step, LOW);
-        ets_delay_us(feed_to_delay(next_feed()) - 5);
+        ets_delay_us(motor_delay - 5);
         d += 2 * dx;
     }
 }
 
-void line_low(int x0, int y0, int x1, int y1) {
+void line_low(int x0, int y0, int x1, int y1, uint32_t motor_delay) {
     int dx = x1 - x0;
     int dy = y1 - y0;
     int yi = 1;
@@ -161,7 +158,7 @@ void line_low(int x0, int y0, int x1, int y1) {
         ets_delay_us(5);
         gpio_set_level(motor_x.step, LOW);
         gpio_set_level(motor_y.step, LOW);
-        ets_delay_us(feed_to_delay(next_feed()) - 5);
+        ets_delay_us(motor_delay - 5);
         D += 2 * dy;
     }
 }
@@ -177,7 +174,7 @@ void motor_power(bool on) {
 }
 
 
-uint32_t feed_to_delay(uint32_t feed) {
+uint32_t feed_to_delay(int feed) {
     uint32_t motorDelay;
     feed = CONSTRAIN(feed, feed, MAX_FEED);
     if (feed <= 0) {
@@ -187,8 +184,8 @@ uint32_t feed_to_delay(uint32_t feed) {
     return motorDelay;
 }
 
-uint32_t leading_axis_steps(int new_x_pos, int new_y_pos) {
+int leading_axis_steps(int new_x_pos, int new_y_pos) {
     int delta_x = abs(new_x_pos - x_pos);
     int delta_y = abs(new_y_pos - y_pos);
-    return (uint32_t) MAX(delta_x, delta_y);
+    return MAX(delta_x, delta_y);
 }

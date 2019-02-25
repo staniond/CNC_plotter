@@ -13,7 +13,7 @@
 #define MIN_ACCELERATION 0
 #define MAX_ACCELERATION 1000
 
-void setup_acceleration(uint32_t steps, uint32_t max_feed);
+void setup_acceleration(uint32_t steps, uint32_t start_feed, uint32_t end_feed);
 
 uint32_t next_feed(void);
 

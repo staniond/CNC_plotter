@@ -7,20 +7,24 @@
 #include <ctype.h>
 
 #include "gcode.h"
+#include "math.h"
 #include "servo.h"
 #include "main.h"
 #include "motors.h"
 #include "fans.h"
 #include "acceleration.h"
+#include "utils.h"
 
 #define COMMAND_LENGTH 20
 
 
 static const char *TAG = "GCODE";
 
+float next_line_cos_angle(int new_x, int new_y, Command command);
+
 
 void process_commands(void *pvParameters) {
-    for(;;){
+    for (;;) {
         Command command;
         xQueueReceive(queue, &command, portMAX_DELAY);
 //        print_command(command);
@@ -52,7 +56,7 @@ void process_commands(void *pvParameters) {
 
         free(command.fields);
         ESP_LOGI(TAG, "Gcode succesfully executed");
-        ESP_LOGI(TAG, "Free spaces in command queue: %d", (int)uxQueueSpacesAvailable(queue));
+        ESP_LOGI(TAG, "Free spaces in command queue: %d", (int) uxQueueSpacesAvailable(queue));
     }
 }
 
@@ -63,20 +67,20 @@ void g_command(Command command, int num) {
         return;
     }
 
-    double feed = NORMAL_FEED;
+    int feed = NORMAL_FEED;
     if (num == 0) {
         feed = MAX_FEED;
     } else if (num == 1) {
         feed = NORMAL_FEED;
     }
 
-    double newX = 0, newY = 0;
+    int newX = 0, newY = 0;
     for (int i = 0; i < command.size; i++) {
         if (command.fields[i].letter == 'X') {
-            newX = command.fields[i].num;
+            newX = (int) (command.fields[i].num * STEPS_PER_MM);
             move = true;
         } else if (command.fields[i].letter == 'Y') {
-            newY = command.fields[i].num;
+            newY = (int) (command.fields[i].num * STEPS_PER_MM);
             move = true;
         } else if (command.fields[i].letter == 'Z') {
             if (command.fields[i].num >= 0) {
@@ -85,11 +89,11 @@ void g_command(Command command, int num) {
                 move_servo(servo_paper_pos);
             }
         } else if (command.fields[i].letter == 'F') {
-            feed = command.fields[i].num;
+            feed = (int) command.fields[i].num;
         }
     }
     if (move) {
-        plot_line(newX, newY, (uint32_t) feed);
+        plot_line(newX, newY, feed);
     }
 }
 
@@ -108,30 +112,28 @@ void e_command(Command command, int num) {
 }
 
 void f_command(Command command, int num) {
-    if(num == 1) {
+    if (num == 1) {
         set_fans(ON);
-    }else if(num == 0){
+    } else if (num == 0) {
         set_fans(OFF);
     }
 }
 
 void m_command(Command command, int num) {
-    if(num != 1) {
+    if (num != 1) {
         return;
     }
     for (int i = 0; i < command.size; ++i) {
-        if(command.fields[i].letter == 'A') {
+        if (command.fields[i].letter == 'A') {
             change_acceleration((int) command.fields[i].num);
-        }else if(command.fields[i].letter == 'F') {
-            change_min_feed((uint32_t) command.fields[i].num);
         }
     }
 }
 
-Command parse_buffer(const char* buffer, int buffer_length) {
+Command parse_buffer(const char *buffer, int buffer_length) {
     int size = 0;
     Command command;
-    command.fields = (Field*) malloc(sizeof(Field) * COMMAND_LENGTH);
+    command.fields = (Field *) malloc(sizeof(Field) * COMMAND_LENGTH);
 
     for (int i = 0; i < buffer_length; i++) {
         if (size >= COMMAND_LENGTH) {
@@ -151,21 +153,21 @@ Command parse_buffer(const char* buffer, int buffer_length) {
         } else if (buffer[i] == ' ') { //skip whitespaces
             continue;
         }
-        if (isalpha((int)buffer[i])) {
+        if (isalpha((int) buffer[i])) {
             command.fields[size].letter = buffer[i];
             command.fields[size].num = atof(&buffer[++i]);
             while (i < buffer_length) {
-                if (isdigit((int)buffer[i]) || buffer[i] == '.' || buffer[i] == ' ' || buffer[i] == '-' || buffer[i] == '+') {
+                if (isdigit((int) buffer[i]) || buffer[i] == '.' || buffer[i] == ' ' || buffer[i] == '-' ||
+                    buffer[i] == '+') {
                     i++;
                     continue;
-                }
-                else {
+                } else {
                     i--;
                     break;
                 }
             }
             size++;
-            if(size > COMMAND_LENGTH) {
+            if (size > COMMAND_LENGTH) {
                 // TODO realloc more memory?
                 ESP_LOGI(TAG, "Gcode with more fields than allocated buffer (%d) fields - restarting", COMMAND_LENGTH);
                 esp_restart();
@@ -187,6 +189,26 @@ Command generate_R_command(void) {
     command.fields[0].letter = 'R';
 
     return command;
+}
+
+float next_line_cos_angle(int new_x, int new_y, Command command) {
+    int next_x = 0, next_y = 0;
+    bool move_command = 0;
+
+    for (int i = 0; i < command.size; i++) {
+        if (command.fields[i].letter == 'X') {
+            next_x = (int) (command.fields[i].num * STEPS_PER_MM);
+            move_command = true;
+        } else if (command.fields[i].letter == 'Y') {
+            next_y = (int) (command.fields[i].num * STEPS_PER_MM);
+            move_command = true;
+        }
+    }
+    if (!move_command) {
+        return -1;
+    }
+
+    return cos_vector_angle(new_x - x_pos, new_y - y_pos, next_x - new_x, next_y - new_y);
 }
 
 void print_command(Command command) {

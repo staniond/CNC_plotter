@@ -7,7 +7,7 @@
 
 typedef struct Field {
     char letter;
-    double num;
+    double num; // TODO refactor to use float instead of double (find out if need to round in software)
 } Field;
 
 typedef struct Command {
