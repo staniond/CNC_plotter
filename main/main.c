@@ -48,7 +48,7 @@ void app_main(void) {
 
 void restart(void) {
     move_servo(SERVO_UP);
-    plot_line(0, 0, MIN_FEED, MAX_FEED);
+    plot_line(0, 0, MAX_FEED);
     motor_power(LOW);
     servo_detach();
     set_fans(OFF);
