@@ -16,8 +16,8 @@
 
 #define MAX_RESOLUTION (1ULL<<13)   // 13 bit timer
 #define PERIOD_uS (1000000.0/PWM_FREQ)
-#define MIN_DUTY_CYCLE (((double)DEFAULT_uS_LOW / PERIOD_uS) * MAX_RESOLUTION)
-#define MAX_DUTY_CYCLE (((double)DEFAULT_uS_HIGH / PERIOD_uS) * MAX_RESOLUTION)
+#define MIN_DUTY_CYCLE (float)((DEFAULT_uS_LOW / PERIOD_uS) * MAX_RESOLUTION)
+#define MAX_DUTY_CYCLE (float)((DEFAULT_uS_HIGH / PERIOD_uS) * MAX_RESOLUTION)
 
 #define SERVO_DOWN_PERCENT 80
 #define SERVO_UP_PERCENT 30
@@ -85,5 +85,5 @@ void servo_detach(void) {
 static uint32_t get_duty_cycle(int percent) {
     percent = CONSTRAIN(percent, 0, 100);
     percent = map(percent, 0, 100, SERVO_DOWN_PERCENT, SERVO_UP_PERCENT);
-    return (uint32_t) map_double(percent, 0, 100, MIN_DUTY_CYCLE, MAX_DUTY_CYCLE);
+    return (uint32_t) mapf(percent, 0, 100, MIN_DUTY_CYCLE, MAX_DUTY_CYCLE);
 }

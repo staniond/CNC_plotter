@@ -10,6 +10,9 @@
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 
 long map(long x, long in_min, long in_max, long out_min, long out_max);
-double map_double(double x, double in_min, double in_max, double out_min, double out_max);
+
+float mapf(float x, float in_min, float in_max, float out_min, float out_max);
+
+float cos_vector_angle(int x0, int y0, float x1, float y1);
 
 #endif //CNC_PLOTTER_UTILS_H
