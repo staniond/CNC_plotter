@@ -21,6 +21,9 @@ static const char *TAG = "MAIN";
 #define TCP_SERVER_TASK_PRIORITY 1 // TODO what priority?
 #define PROCESS_COMMANDS_TASK_PRIORITY 1
 
+#define TCP_SERVER_TASK_CORE 0
+#define PROCESS_COMMANDS_TASK_CORE 1
+
 QueueHandle_t queue;
 
 void app_main(void) {
@@ -42,8 +45,10 @@ void app_main(void) {
     wait_for_ip();
 
     // TODO check free stack space and optimize
-    xTaskCreate(tcp_server_task, "tcp_server_task", 4096, NULL, TCP_SERVER_TASK_PRIORITY, NULL);
-    xTaskCreate(process_commands, "process_commands_task", 4096, NULL, PROCESS_COMMANDS_TASK_PRIORITY, NULL);
+    xTaskCreatePinnedToCore(tcp_server_task, "tcp_server_task", 4096, NULL, TCP_SERVER_TASK_PRIORITY, NULL,
+                            TCP_SERVER_TASK_CORE);
+    xTaskCreatePinnedToCore(process_commands, "process_commands_task", 4096, NULL, PROCESS_COMMANDS_TASK_PRIORITY, NULL,
+                            PROCESS_COMMANDS_TASK_CORE);
 }
 
 void restart(void) {
