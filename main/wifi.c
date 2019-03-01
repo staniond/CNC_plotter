@@ -215,7 +215,7 @@ static void client_loop(int sock) {
                     Command command = parse_buffer(line_buffer, line_len);
                     xQueueSend(queue, &command, portMAX_DELAY);
 
-                    char answer[8];
+                    char answer[16];
                     size_t answer_length = (size_t) snprintf(answer, sizeof(answer) / sizeof(answer[0]), "OK (%u)\n",
                                                  QUEUE_SIZE - uxQueueSpacesAvailable(queue));
 
