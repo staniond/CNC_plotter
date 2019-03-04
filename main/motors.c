@@ -71,6 +71,13 @@ void motor_setup(void) {
 
 void plot_line(int new_x_pos, int new_y_pos, int feed) {
     vTaskSuspendAll();  // TODO try suspending interrupts also?
+    
+    if(new_x_pos == -1) {
+        new_x_pos = x_pos;
+    }
+    if(new_y_pos == -1) {
+        new_y_pos = y_pos;
+    }
 
     new_x_pos = CONSTRAIN(new_x_pos, 0, MAX_STEPS);
     new_y_pos = CONSTRAIN(new_y_pos, 0, MAX_STEPS);

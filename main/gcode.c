@@ -74,7 +74,7 @@ void g_command(Command command, int num) {
         feed = NORMAL_FEED;
     }
 
-    int newX = 0, newY = 0;
+    int newX = -1, newY = -1;
     for (int i = 0; i < command.size; i++) {
         if (command.fields[i].letter == 'X') {
             newX = (int) (command.fields[i].num * STEPS_PER_MM);
