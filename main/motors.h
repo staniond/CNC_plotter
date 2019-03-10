@@ -10,7 +10,7 @@
 #define HIGH 1
 #define LOW 0
 
-#define MAX_STEPS 4240
+#define MAX_STEPS 4320
 #define MAX_RANGE_MM 40
 #define STEPS_PER_MM ((float)MAX_STEPS/MAX_RANGE_MM)
 
