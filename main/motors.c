@@ -32,14 +32,14 @@ void line_high(int x0, int y0, int x1, int y1, uint32_t motor_delay);
 void line_low(int x0, int y0, int x1, int y1, uint32_t motor_delay);
 
 Motor motor_x = {
-        .enabled = 27,
-        .step = 14,
-        .dir = 12,
+        .enabled = 5,
+        .step = 18,
+        .dir = 19,
 };
 Motor motor_y = {
-        .enabled = 33,
-        .step = 25,
-        .dir = 26,
+        .enabled = 23,
+        .step = 22,
+        .dir = 21,
 };
 
 int x_pos = 0;
