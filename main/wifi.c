@@ -193,11 +193,13 @@ void tcp_server_task(void *pvParameters) {
 
 static void client_loop(int sock) {
     char rx_buffer[BUFFER_SIZE];
+
     size_t line_len = 0;
     char *line_buffer = malloc(sizeof(char) * LINE_SIZE);
+
     for (;;) {
         int len = recv(sock, rx_buffer, BUFFER_SIZE - 1, 0);
-        // Error occured during receiving
+        // Error occurred during receiving
         if (len < 0) {
             ESP_LOGE(TAG, "recv failed: errno %d", errno);
             break;
@@ -210,8 +212,8 @@ static void client_loop(int sock) {
             // Data received
         else {
             for (int i = 0; i < len; i++) {
-                if (rx_buffer[i] == '\n') {
-                    line_buffer[line_len++] = '\0';
+                if (rx_buffer[i] == '\n') { // end of line reached
+                    line_buffer[line_len++] = '\0'; // null character needed for C strings
 
                     Command command = parse_buffer(line_buffer, line_len);
                     xQueueSend(queue, &command, portMAX_DELAY);
