@@ -31,12 +31,12 @@ void line_high(int x0, int y0, int x1, int y1, uint32_t motor_delay);
 
 void line_low(int x0, int y0, int x1, int y1, uint32_t motor_delay);
 
-Motor motor_x = {
+Motor motor_y = {
         .enabled = 5,
         .step = 18,
         .dir = 19,
 };
-Motor motor_y = {
+Motor motor_x = {
         .enabled = 23,
         .step = 22,
         .dir = 21,
@@ -86,9 +86,9 @@ void plot_line(int new_x_pos, int new_y_pos, int feed) {
 
     //set motor direction
     if (x_pos > new_x_pos) {
-        gpio_set_level(motor_x.dir, HIGH);
-    } else {
         gpio_set_level(motor_x.dir, LOW);
+    } else {
+        gpio_set_level(motor_x.dir, HIGH);
     }
     if (y_pos > new_y_pos) {
         gpio_set_level(motor_y.dir, HIGH);
