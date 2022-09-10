@@ -28,7 +28,7 @@ QueueHandle_t queue;
 
 void app_main(void) {
     ESP_ERROR_CHECK(nvs_flash_init());
-    esp_log_level_set("*", ESP_LOG_NONE);   // TODO command to turn on and off debug messages
+    esp_log_level_set("*", ESP_LOG_VERBOSE);   // TODO command to turn on and off debug messages
 
     led_setup();
     led_light(YELLOW);

@@ -9,7 +9,7 @@
 #include "freertos/event_groups.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
-#include "esp_event_loop.h"
+#include "esp_event.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
 
@@ -56,7 +56,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event) {
             xEventGroupSetBits(wifi_event_group, IPV4_GOT_IP_BIT);
             ESP_LOGI(TAG, "SYSTEM_EVENT_STA_GOT_IP");
 
-            char *ip4 = ip4addr_ntoa(&event->event_info.got_ip.ip_info.ip);
+            char *ip4 = ip4addr_ntoa((const ip4_addr_t *) &event->event_info.got_ip.ip_info.ip);
             ESP_LOGI(TAG, "IPv4: %s", ip4);
             printf("Connected with ip: %s (port: %d)\n", ip4, TCP_PORT);
             break;
@@ -70,7 +70,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event) {
             xEventGroupSetBits(wifi_event_group, IPV6_GOT_IP_BIT);
             ESP_LOGI(TAG, "SYSTEM_EVENT_STA_GOT_IP6");
 
-            char *ip6 = ip6addr_ntoa(&event->event_info.got_ip6.ip6_info.ip);
+            char *ip6 = ip6addr_ntoa((const ip6_addr_t *) &event->event_info.got_ip6.ip6_info.ip);
             ESP_LOGI(TAG, "IPv6: %s", ip6);
         default:
             break;
@@ -101,9 +101,9 @@ void initialise_wifi(void) {
     };
     ESP_LOGI(TAG, "Setting WiFi configuration SSID: \"%s\"", wifi_config.sta.ssid);
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-    ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config));
+    ESP_ERROR_CHECK(esp_wifi_set_config((wifi_interface_t) ESP_IF_WIFI_STA, &wifi_config));
     ESP_ERROR_CHECK(esp_wifi_start());
-    ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE))
+    ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));
 }
 
 void wait_for_ip(void) {
